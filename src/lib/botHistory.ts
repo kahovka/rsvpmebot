@@ -8,7 +8,8 @@ export interface BotHistoryEntry {
 }
 
 export function saveMessage(entry: BotHistoryEntry) {
-	history.set(entry.message.id, entry);
+	history.set(entry.message.message_id, entry);
+	console.log('Logged this: ', entry);
 }
 
 export function getAllEntries(): BotHistoryEntry[] {

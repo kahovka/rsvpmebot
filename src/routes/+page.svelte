@@ -10,7 +10,7 @@
 	<ul class="messages">
 		{#each data.messages as message (message.message_id)}
 			<li>
-				<p>{message.date}</p>
+				<p>{new Date(message.date).toISOString()}</p>
 				<p>{message.text}</p>
 			</li>
 		{/each}
