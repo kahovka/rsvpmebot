@@ -38,7 +38,7 @@ jobs:
         uses: denoland/deployctl@v1
         with:
           project: "rsvpmebot-42"
-          entrypoint: "index.js"
+          entrypoint: "--unstable-bare-node-builtins index.js"
           root: "build"
           
           
