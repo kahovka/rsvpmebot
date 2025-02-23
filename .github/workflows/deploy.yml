@@ -37,7 +37,7 @@ jobs:
       - name: Upload to Deno Deploy
         uses: denoland/deployctl@v1
         with:
-          project: "rsvpmebot-101"
+          project: "rsvpmebot-42"
           entrypoint: "index.js"
           root: "build"
           
