@@ -1,4 +1,9 @@
 {
 	"nodeModulesDir": "auto",
-	"unstable": ["bare-node-builtins", "webgpu"]
+	"unstable": ["bare-node-builtins", "webgpu"],
+	"imports": {
+		"@logtape/logtape": "npm:@logtape/logtape@^0.8.2",
+		"node-telegram-bot-api": "npm:node-telegram-bot-api",
+		"dotenv": "npm:dotenv"
+	}
 }

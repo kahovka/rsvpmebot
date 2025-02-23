@@ -1,10 +1,11 @@
 import { bot } from '$lib/bot.ts';
 import { RequestHandler } from '@sveltejs/kit';
+import { logger } from '../../../logger.ts';
 
 export const POST: RequestHandler = async ({ request }) => {
 	try {
 		const requestBody = await request.json();
-		console.log('Received request', requestBody);
+		logger.info('Received request {text}', { text: JSON.stringify(requestBody) });
 		bot.processUpdate(requestBody);
 		return new Response('', { status: 200 });
 	} catch (e) {

@@ -3,6 +3,7 @@
   "specifiers": {
     "npm:@eslint/compat@^1.2.5": "1.2.7_eslint@9.20.1",
     "npm:@eslint/js@^9.18.0": "9.20.0",
+    "npm:@logtape/logtape@~0.8.2": "0.8.2",
     "npm:@sveltejs/adapter-node@^5.2.12": "5.2.12_@sveltejs+kit@2.17.2__@sveltejs+vite-plugin-svelte@5.0.3___svelte@5.20.2____acorn@8.14.0___vite@6.1.1____lightningcss@1.29.1__svelte@5.20.2___acorn@8.14.0__vite@6.1.1___lightningcss@1.29.1_rollup@4.34.8_@sveltejs+vite-plugin-svelte@5.0.3__svelte@5.20.2___acorn@8.14.0__vite@6.1.1___lightningcss@1.29.1_svelte@5.20.2__acorn@8.14.0_vite@6.1.1__lightningcss@1.29.1",
     "npm:@sveltejs/kit@^2.16.0": "2.17.2_@sveltejs+vite-plugin-svelte@5.0.3__svelte@5.20.2___acorn@8.14.0__vite@6.1.1___lightningcss@1.29.1_svelte@5.20.2__acorn@8.14.0_vite@6.1.1__lightningcss@1.29.1",
     "npm:@sveltejs/vite-plugin-svelte@5": "5.0.3_svelte@5.20.2__acorn@8.14.0_vite@6.1.1__lightningcss@1.29.1",
@@ -12,6 +13,7 @@
     "npm:@types/deno@^2.2.0": "2.2.0",
     "npm:@types/node-telegram-bot-api@~0.64.7": "0.64.7",
     "npm:@types/node@*": "22.5.4",
+    "npm:dotenv@*": "16.4.7",
     "npm:eslint-config-prettier@^10.0.1": "10.0.1_eslint@9.20.1",
     "npm:eslint-plugin-svelte@^2.46.1": "2.46.1_eslint@9.20.1_svelte@5.20.2__acorn@8.14.0_postcss@8.5.3",
     "npm:eslint@^9.18.0": "9.20.1",
@@ -312,6 +314,9 @@
         "@jridgewell/resolve-uri",
         "@jridgewell/sourcemap-codec"
       ]
+    },
+    "@logtape/logtape@0.8.2": {
+      "integrity": "sha512-KikaMHi64p0BHYrYOE2Lom4dOE3R8PGT+21QJ5Ql/SWy0CNOp69dkAlG9RXzENQ6PAMWtiU+4kelJYNvfUvHOQ=="
     },
     "@nodelib/fs.scandir@2.1.5": {
       "integrity": "sha512-vq24Bq3ym5HEQm2NKCr3yXDwjc7vTsEThRDnkp2DK9p1uqLR+DHurm/NOTo0KG7HYHU7eppKZj3MyqYuMBf62g==",
@@ -1153,6 +1158,9 @@
     },
     "dom-accessibility-api@0.6.3": {
       "integrity": "sha512-7ZgogeTnjuHbo+ct10G9Ffp0mif17idi0IyWNVA/wcwcm7NPOD/WEHVP3n7n3MhXqxoIYm8d6MuZohYWIZ4T3w=="
+    },
+    "dotenv@16.4.7": {
+      "integrity": "sha512-47qPchRCykZC03FhkYAhrvwU4xDBFIj1QPqaarj6mdM/hgUzfPHcpkHJOn3mJAufFeeAxAzeGsr5X0M4k6fLZQ=="
     },
     "dunder-proto@1.0.1": {
       "integrity": "sha512-KIN/nDJBQRcXw0MLVhZE9iQHmG68qAVIBg9CqmUYjmQIhgij9U5MFvrqkUL5FbtyyzZuOeOt0zdeRe4UY7ct+A==",
@@ -3197,6 +3205,11 @@
     }
   },
   "workspace": {
+    "dependencies": [
+      "npm:@logtape/logtape@~0.8.2",
+      "npm:dotenv@*",
+      "npm:node-telegram-bot-api@*"
+    ],
     "packageJson": {
       "dependencies": [
         "npm:@eslint/compat@^1.2.5",
