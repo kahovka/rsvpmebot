@@ -29,6 +29,8 @@
     "npm:svelte-check@4": "4.1.4_svelte@5.20.2__acorn@8.14.0_typescript@5.7.3",
     "npm:svelte@5": "5.20.2_acorn@8.14.0",
     "npm:tailwindcss@4": "4.0.8",
+    "npm:ts-pattern@*": "5.6.2",
+    "npm:ts-pattern@^5.6.2": "5.6.2",
     "npm:typescript-eslint@^8.20.0": "8.24.1_eslint@9.20.1_typescript@5.7.3_@typescript-eslint+parser@8.24.1__eslint@9.20.1__typescript@5.7.3",
     "npm:typescript@5": "5.7.3",
     "npm:vite@6": "6.1.1_@types+node@22.5.4",
@@ -2889,6 +2891,9 @@
         "typescript"
       ]
     },
+    "ts-pattern@5.6.2": {
+      "integrity": "sha512-d4IxJUXROL5NCa3amvMg6VQW2HVtZYmUTPfvVtO7zJWGYLJ+mry9v2OmYm+z67aniQoQ8/yFNadiEwtNS9qQiw=="
+    },
     "tunnel-agent@0.6.0": {
       "integrity": "sha512-McnNiV1l8RYeY8tBgEpuodCC1mLUdbSN+CYBL7kJsJNInOP8UjDDEwdk6Mw60vdLLrr5NHKZhMAOSrR2NZuQ+w==",
       "dependencies": [
@@ -3235,6 +3240,7 @@
         "npm:svelte-check@4",
         "npm:svelte@5",
         "npm:tailwindcss@4",
+        "npm:ts-pattern@^5.6.2",
         "npm:typescript-eslint@^8.20.0",
         "npm:typescript@5",
         "npm:vite@6",
