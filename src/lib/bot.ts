@@ -1,6 +1,6 @@
 import TelegramBot from 'npm:node-telegram-bot-api';
 import { saveMessage } from './botHistory.ts';
-import 'dotenv/config';
+//import 'dotenv/config';
 
 export const bot = new TelegramBot(Deno.env.get('BOT_TOKEN'));
 
