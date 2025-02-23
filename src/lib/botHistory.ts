@@ -1,4 +1,4 @@
-import TelegramBot from 'node-telegram-bot-api';
+import TelegramBot from 'npm:node-telegram-bot-api';
 
 const history: Map<string, BotHistoryEntry> = new Map();
 
