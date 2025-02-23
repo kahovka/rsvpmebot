@@ -4,6 +4,7 @@
 	"imports": {
 		"@logtape/logtape": "npm:@logtape/logtape@^0.8.2",
 		"node-telegram-bot-api": "npm:node-telegram-bot-api",
-		"dotenv": "npm:dotenv"
+		"dotenv": "npm:dotenv",
+		"fs": "node:fs"
 	}
 }
