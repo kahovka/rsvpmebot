@@ -1,6 +1,7 @@
 {
 	"nodeModulesDir": "auto",
 	"unstable": ["bare-node-builtins", "webgpu"],
+	"importMap": "./import_map.json",
 	"imports": {
 		"@logtape/logtape": "npm:@logtape/logtape@^0.8.2",
 		"node-telegram-bot-api": "npm:node-telegram-bot-api",
