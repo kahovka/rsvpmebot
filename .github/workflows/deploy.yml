@@ -29,16 +29,17 @@ jobs:
           node-version: lts/*
 
       - name: Install step
-        run: "deno install"
+        run: 'deno install'
 
       - name: Build step
-        run: "deno task build"
+        env:
+          BOT_TOKEN: ${{ secrets.BOT_TOKEN }}
+          MONGO_DB_URL: ${{ secrets.MONGO_DB_URL }}
+        run: 'deno task build'
 
       - name: Upload to Deno Deploy
         uses: denoland/deployctl@v1
         with:
-          project: "rsvpmebot-42"
-          entrypoint: "index.js"
-          root: "build"
-          
-          
+          project: 'rsvpmebot-42'
+          entrypoint: 'index.js'
+          root: 'build'
