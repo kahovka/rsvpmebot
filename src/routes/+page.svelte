@@ -8,6 +8,7 @@
 	<h1>New Messages</h1>
 
 	<ul class="messages">
+		{JSON.stringify(data)}
 		{#each data.events as event}
 			<li>
 				<p>{event.content}</p>
