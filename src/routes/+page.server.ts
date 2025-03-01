@@ -1,12 +1,13 @@
-import * as history from '$lib/botHistory.ts';
-import { BotHistoryEntry } from '../lib/botHistory.ts';
+import { eventCollection } from '../db/mongo.ts';
+import { RSVPEvent } from '../db/types.ts';
 import { logger } from '../logger.ts';
 
-export function load() {
-	logger.debug(`Loading history entries: {numEntries}`, {
-		numEntries: history.getAllEntries().map((it: BotHistoryEntry) => it.message.message_id)
+export async function load() {
+	const availableEvents = await eventCollection().find().toArray();
+	logger.debug(`Loading current events: {numEntries}`, {
+		numEntries: availableEvents.length
 	});
 	return {
-		messages: history.getAllEntries().map((it: BotHistoryEntry) => it.message)
+		events: availableEvents.map((it: RSVPEvent) => ({ eventContent: JSON.stringify(it) }))
 	};
 }

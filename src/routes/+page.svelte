@@ -8,10 +8,9 @@
 	<h1>New Messages</h1>
 
 	<ul class="messages">
-		{#each data.messages as message (message.message_id)}
+		{#each data.events as event}
 			<li>
-				<p>{new Date(message.date).toISOString()}</p>
-				<p>{message.text}</p>
+				<p>{event}</p>
 			</li>
 		{/each}
 	</ul>
