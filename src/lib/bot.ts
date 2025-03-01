@@ -145,7 +145,7 @@ const setParticipantLimit = async (
 	message: TelegramBot.Message,
 	event: RSVPEvent
 ) => {
-	const participantLimit = number(message.text);
+	const participantLimit = parseInt(message.text);
 	const messageToSend =
 		event.name + '\n' + event.description + '\n' + `Participants: ${participantLimit}`;
 
