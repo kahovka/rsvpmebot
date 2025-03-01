@@ -3,8 +3,9 @@ import { match } from 'npm:ts-pattern';
 import { logger } from '../logger.ts';
 import { eventCollection } from '../db/mongo.ts';
 import { BotStates } from '../types/bot.ts';
+import { env } from '$env/dynamic/private';
 
-export const bot = new TelegramBot(Deno.env.get('BOT_TOKEN') ?? 'tokenismissing');
+export const bot = new TelegramBot(env.BOT_TOKEN);
 
 const newEventState: BotState = {
 	state: BotStates.NewEvent,
