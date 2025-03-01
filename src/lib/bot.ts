@@ -153,13 +153,16 @@ const setParticipantLimit = async (
 	await bot.deleteMessage(message.chat.id, message.message_id);
 	await bot
 		.sendMessage(message.chat.id, messageToSend, {
-			reply_markup: {
+			reply_markup: JSON.stringify({
 				inline_keyboard: [
-					{ text: 'Yey', callback_data: 'yay' },
-					{ text: 'Nay', callback_data: 'nay' }
+					[
+						{ text: 'Yey', callback_data: 'yay' },
+						{ text: 'Nay', callback_data: 'nay' }
+					]
 				],
 				...botMessageOptions.reply_markup
-			}
+			}),
+			parse_mode: 'HTML'
 		})
 		.then((replyMessage: TelegramBot.Message) => {
 			eventCollection().updateOne(
