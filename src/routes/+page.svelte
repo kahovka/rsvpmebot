@@ -10,7 +10,7 @@
 	<ul class="messages">
 		{#each data.events as event}
 			<li>
-				<p>{event}</p>
+				<p>{event.content}</p>
 			</li>
 		{/each}
 	</ul>
