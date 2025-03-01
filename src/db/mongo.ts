@@ -20,3 +20,9 @@ export const disconnectFromDb = async () =>
 export const eventDb = () => client.db();
 
 export const eventCollection = () => client.db().collection<RSVPEvent>('events');
+
+export const getEvent = async (chatId: number, lastBotMessageId: number) =>
+	await eventCollection().findOne({
+		chatId: chatId,
+		lastMessageId: lastBotMessageId
+	});
