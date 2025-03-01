@@ -1,9 +1,8 @@
 import { MongoClient } from 'npm:mongodb';
-import { MONGO_DB_URL } from '$env/static/private';
 import { logger } from '../logger.ts';
 import { RSVPEvent } from './types.ts';
 
-const client = new MongoClient(MONGO_DB_URL);
+const client = new MongoClient(Deno.env.get('MONGO_DB_URL') ?? 'whoknowswhatsfoinigone');
 
 export const connectToDb = async () =>
 	await client
