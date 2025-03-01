@@ -1,11 +1,10 @@
 import TelegramBot from 'npm:node-telegram-bot-api';
 import { match } from 'npm:ts-pattern';
-import { BOT_TOKEN } from '$env/static/private';
 import { logger } from '../logger.ts';
 import { eventCollection } from '../db/mongo.ts';
 import { BotStates } from '../types/bot.ts';
 
-export const bot = new TelegramBot(BOT_TOKEN);
+export const bot = new TelegramBot(Deno.env.get('BOT_TOKEN') ?? 'tokenismissing');
 
 const newEventState: BotState = {
 	state: BotStates.NewEvent,
