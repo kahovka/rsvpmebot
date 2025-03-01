@@ -154,7 +154,10 @@ const setParticipantLimit = async (
 	await bot
 		.sendMessage(message.chat.id, messageToSend, {
 			reply_markup: {
-				inline_keyboard: [[{ text: 'Yey' }, { text: 'Nay' }]],
+				inline_keyboard: [
+					{ text: 'Yey', callback_data: 'yay' },
+					{ text: 'Nay', callback_data: 'nay' }
+				],
 				...botMessageOptions.reply_markup
 			}
 		})
