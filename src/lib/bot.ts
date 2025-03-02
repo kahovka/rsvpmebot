@@ -13,6 +13,11 @@ import { logger } from '../logger.ts';
 
 export const bot = new TelegramBot(env.BOT_TOKEN);
 
+// match-all debug
+bot.onText(/.*/, (message: TelegramBot.Message) => {
+	logger.debug('Received something: {message}', { message });
+});
+
 bot.onText('\/event', async (message: TelegramBot.Message) => {
 	await createNewEvent(bot, message);
 });
