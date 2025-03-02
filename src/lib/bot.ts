@@ -151,9 +151,7 @@ const setParticipantLimit = async (
 		.findOneAndUpdate(
 			{ _id: event._id },
 			{
-				$set: {
-					participantLimit: participantLimit
-				}
+				$set: { participantLimit }
 			},
 			{ upsert: true, returnDocument: 'after' }
 		)

@@ -10,7 +10,7 @@ import {
 } from './botStates.ts';
 
 export const getEventDescriptionHtml = (event: RSVPEvent) => {
-	return event.name + '\n' + event.description + '\n' + `Participants: ${event.numParticipants}`;
+	return event.name + '\n' + event.description + '\n' + `Participants: ${event.participantLimit}`;
 };
 
 export const getEventNextState = (event: RSVPEvent): RSVPEventState => {

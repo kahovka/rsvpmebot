@@ -7,7 +7,7 @@ export interface RSVPEvent {
 	state: RSVPEventState;
 	name?: string;
 	description?: string;
-	numParticipants?: number;
+	participantLimit?: number;
 }
 
 export enum RSVPEventState {
