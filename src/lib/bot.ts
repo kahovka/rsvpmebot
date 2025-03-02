@@ -1,41 +1,17 @@
+import { env } from '$env/dynamic/private';
 import TelegramBot from 'npm:node-telegram-bot-api';
 import { match } from 'npm:ts-pattern';
-import { logger } from '../logger.ts';
+import { newEventState, settingDescriptionState, settingNameState } from '../bot/botStates.ts';
+import {
+	botActionErrorCallback,
+	deleteExistingMessagesAndReply,
+	getEventDescriptionHtml
+} from '../bot/utils.ts';
 import { eventCollection, getEvent } from '../db/mongo.ts';
-import { env } from '$env/dynamic/private';
 import { RSVPEvent, RSVPEventState } from '../db/types.ts';
+import { logger } from '../logger.ts';
 
 export const bot = new TelegramBot(env.BOT_TOKEN);
-
-const newEventState: BotState = {
-	state: RSVPEventState.NewEvent,
-	nextState: RSVPEventState.NewEvent,
-	messageToSend: 'What is your event called?'
-};
-
-const settingNameState: BotState = {
-	state: RSVPEventState.NewEvent,
-	nextState: RSVPEventState.NameSet,
-	messageToSend: 'Does your event have some description?'
-};
-
-const settingDescriptionState: BotState = {
-	state: RSVPEventState.NameSet,
-	nextState: RSVPEventState.DescriptionSet,
-	messageToSend: 'Does you event have participant limit?'
-};
-
-const settingParticipantLimitState: BotState = {
-	state: RSVPEventState.DescriptionSet,
-	nextState: RSVPEventState.Polling,
-	messageToSend: ''
-};
-
-interface BotState {
-	state: RSVPEventState;
-	nextState: RSVPEventState;
-	messageToSend: string | undefined;
-}
 
 bot.onText('\/event', async (message: TelegramBot.Message) => {
 	await createNewEvent(bot, message);
@@ -75,45 +51,64 @@ bot.on('message', async (message: TelegramBot.Message) => {
 	}
 });
 
-const botMessageOptions = {
-	reply_markup: {
-		force_reply: true
-	}
-};
+bot.on('callback_query', (query: TelegramBot.CallbackQuery) => {
+	logger.info('Received callback: {query}', { query });
+});
+
+const botMessageTextOptions = JSON.stringify({
+	force_reply: true
+});
+
+const botMessageInlineKeyboardOptions = JSON.stringify({
+	inline_keyboard: [
+		[
+			{ text: 'Yey', callback_data: 'yay' },
+			{ text: 'Nay', callback_data: 'nay' }
+		]
+	],
+	force_reply: true
+});
 
 const createNewEvent = async (bot: TelegramBot, message: TelegramBot.Message) => {
-	//create new event here, log last message id as the event
-
 	await bot.deleteMessage(message.chat.id, message.message_id);
 	await bot
-		.sendMessage(message.chat.id, newEventState.messageToSend, botMessageOptions)
+		.sendMessage(message.chat.id, newEventState.messageToSend, {
+			reply_markup: botMessageTextOptions
+		})
 		.then((replyMessage: TelegramBot.Message) => {
 			eventCollection().insertOne({
 				chatId: message.chat.id,
 				lastMessageId: replyMessage.message_id,
 				state: newEventState.nextState
 			});
-		});
+		})
+		.catch((error: unknown) => botActionErrorCallback(error, bot, message));
 };
 
 const setEventName = async (bot: TelegramBot, message: TelegramBot.Message, event: RSVPEvent) => {
-	await bot.deleteMessage(message.chat.id, event.lastMessageId);
-	await bot.deleteMessage(message.chat.id, message.message_id);
-	await bot
-		.sendMessage(message.chat.id, settingNameState.messageToSend, botMessageOptions)
-		.then((replyMessage: TelegramBot.Message) => {
-			eventCollection().updateOne(
-				{ _id: event._id },
-				{
-					$set: {
-						lastMessageId: replyMessage.message_id,
-						state: settingNameState.nextState,
-						name: message.text
-					}
-				},
-				{ upsert: true }
+	await eventCollection()
+		.findOneAndUpdate(
+			{ _id: event._id },
+			{
+				$set: {
+					name: message.text
+				}
+			},
+			{ upsert: true, returnDocument: 'after' }
+		)
+		.then(async (updatedEvent) => {
+			if (!updatedEvent) {
+				throw `No event found to update, ${event._id}, ${JSON.stringify(message)}`;
+			}
+			await deleteExistingMessagesAndReply(
+				bot,
+				message,
+				updatedEvent,
+				settingNameState.messageToSend,
+				botMessageTextOptions
 			);
-		});
+		})
+		.catch((error: unknown) => botActionErrorCallback(error, bot, message));
 };
 
 const setEventDescription = async (
@@ -121,23 +116,29 @@ const setEventDescription = async (
 	message: TelegramBot.Message,
 	event: RSVPEvent
 ) => {
-	await bot.deleteMessage(message.chat.id, event.lastMessageId);
-	await bot.deleteMessage(message.chat.id, message.message_id);
-	await bot
-		.sendMessage(message.chat.id, settingDescriptionState.messageToSend, botMessageOptions)
-		.then((replyMessage: TelegramBot.Message) => {
-			eventCollection().updateOne(
-				{ _id: event._id },
-				{
-					$set: {
-						lastMessageId: replyMessage.message_id,
-						state: settingDescriptionState.nextState,
-						description: message.text
-					}
-				},
-				{ upsert: true }
+	await eventCollection()
+		.findOneAndUpdate(
+			{ _id: event._id },
+			{
+				$set: {
+					description: message.text
+				}
+			},
+			{ upsert: true, returnDocument: 'after' }
+		)
+		.then(async (updatedEvent) => {
+			if (!updatedEvent) {
+				throw `No event found to update, ${event._id}, ${JSON.stringify(message)}`;
+			}
+			await deleteExistingMessagesAndReply(
+				bot,
+				message,
+				updatedEvent,
+				settingDescriptionState.messageToSend,
+				botMessageTextOptions
 			);
-		});
+		})
+		.catch((error: unknown) => botActionErrorCallback(error, bot, message));
 };
 
 const setParticipantLimit = async (
@@ -145,36 +146,28 @@ const setParticipantLimit = async (
 	message: TelegramBot.Message,
 	event: RSVPEvent
 ) => {
-	const participantLimit = parseInt(message.text);
-	const messageToSend =
-		event.name + '\n' + event.description + '\n' + `Participants: ${participantLimit}`;
-
-	await bot.deleteMessage(message.chat.id, event.lastMessageId);
-	await bot.deleteMessage(message.chat.id, message.message_id);
-	await bot
-		.sendMessage(message.chat.id, messageToSend, {
-			reply_markup: JSON.stringify({
-				inline_keyboard: [
-					[
-						{ text: 'Yey', callback_data: 'yay' },
-						{ text: 'Nay', callback_data: 'nay' }
-					]
-				],
-				...botMessageOptions.reply_markup
-			}),
-			parse_mode: 'HTML'
-		})
-		.then((replyMessage: TelegramBot.Message) => {
-			eventCollection().updateOne(
-				{ _id: event._id },
-				{
-					$set: {
-						lastMessageId: replyMessage.message_id,
-						state: settingParticipantLimitState.nextState,
-						participantLimit: participantLimit
-					}
-				},
-				{ upsert: true }
+	const participantLimit = Number(message.text) || 0;
+	await eventCollection()
+		.findOneAndUpdate(
+			{ _id: event._id },
+			{
+				$set: {
+					participantLimit: participantLimit
+				}
+			},
+			{ upsert: true, returnDocument: 'after' }
+		)
+		.then(async (updatedEvent) => {
+			if (!updatedEvent) {
+				throw `No event found to update, ${event._id}, ${JSON.stringify(message)}`;
+			}
+			await deleteExistingMessagesAndReply(
+				bot,
+				message,
+				updatedEvent,
+				getEventDescriptionHtml(event),
+				botMessageInlineKeyboardOptions
 			);
-		});
+		})
+		.catch((error: unknown) => botActionErrorCallback(error, bot, message));
 };
