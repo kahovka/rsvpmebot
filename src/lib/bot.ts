@@ -6,6 +6,7 @@ import {
 	botActionErrorCallback,
 	deleteExistingMessagesAndReply,
 	getEventDescriptionHtml,
+	getParticipantDisplayName,
 	sendNewEventMessage
 } from '../bot/utils.ts';
 import { eventCollection, getEvent } from '../db/mongo.ts';
@@ -161,9 +162,22 @@ const removeParticipant = async (query: TelegramBot.CallbackQuery, event: RSVPEv
 		: newFullListOfParticipants;
 
 	const newWaitingList = maxParticipants ? [] : newFullListOfParticipants.splice(maxParticipants);
-	await saveNewParticipantsAndNotify(bot, query, event, newParticipantsList, newWaitingList).catch(
-		(error) => botActionErrorCallback(error, bot, query.message)
-	);
+	await saveNewParticipantsAndNotify(bot, query, event, newParticipantsList, newWaitingList)
+		.then(async () => {
+			const newParticipantsOntheBlock = newParticipantsList.filter(
+				(participant) => !event.participantsList?.map(({ tgid }) => tgid).includes(participant.tgid)
+			);
+			if (newParticipantsOntheBlock.length > 0) {
+				await bot.sendMessage(
+					query.message.chat.id,
+					`Hello ${getParticipantDisplayName(newParticipantsOntheBlock[0])}, there is a spot for you now!`,
+					{
+						reply_markup: botMessageTextOptions
+					}
+				);
+			}
+		})
+		.catch((error) => botActionErrorCallback(error, bot, query.message));
 };
 
 const botMessageTextOptions = JSON.stringify({

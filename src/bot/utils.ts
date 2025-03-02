@@ -9,7 +9,7 @@ import {
 	settingParticipantLimitState
 } from './botStates.ts';
 
-const getParticipantDisplayName = (participant: EventParticipant) =>
+export const getParticipantDisplayName = (participant: EventParticipant) =>
 	`${participant.firstName} (${participant.username})`;
 
 export const getEventDescriptionHtml = (event: RSVPEvent) => {
