@@ -1,18 +1,15 @@
 {
 	"nodeModulesDir": "auto",
-	"unstable": [
-    "bare-node-builtins",
-    "webgpu",
-    "sloppy-imports"
-  ],
+	"unstable": ["bare-node-builtins", "webgpu", "sloppy-imports"],
 	"imports": {
 		"@logtape/logtape": "npm:@logtape/logtape@^0.8.2",
 		"node-telegram-bot-api": "npm:node-telegram-bot-api",
-		"dotenv": "npm:dotenv",
+		"ts-pattern": "npm:ts-pattern@^5.6.2",
+		"mongodb": "npm:mongodb",
 		"fs": "node:fs"
-  },
-  "compilerOptions": {
-    "checkJs": true,
-    "strict": true
-  }
+	},
+	"compilerOptions": {
+		"checkJs": true,
+		"strict": true
+	}
 }

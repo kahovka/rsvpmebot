@@ -1,5 +1,6 @@
 <script>
 	let { data } = $props();
+	let { events } = data;
 </script>
 
 <h1>Hello and welcome to my site!</h1>
@@ -9,7 +10,7 @@
 
 	<ul class="messages">
 		{JSON.stringify(data)}
-		{#each data.events as event}
+		{#each events as event}
 			<li>
 				<p>{event.content}</p>
 			</li>

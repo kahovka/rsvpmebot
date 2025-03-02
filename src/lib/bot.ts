@@ -1,6 +1,6 @@
 import { env } from '$env/dynamic/private';
-import TelegramBot from 'npm:node-telegram-bot-api';
-import { match } from 'npm:ts-pattern';
+import TelegramBot from 'node-telegram-bot-api';
+import { match } from 'ts-pattern';
 import { newEventState, settingDescriptionState, settingNameState } from '../bot/botStates.ts';
 import {
 	botActionErrorCallback,

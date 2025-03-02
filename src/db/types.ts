@@ -1,4 +1,4 @@
-import { ObjectId } from 'npm:mongodb';
+import { ObjectId } from 'mongodb';
 
 export interface RSVPEvent {
 	_id?: ObjectId;
