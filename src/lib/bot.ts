@@ -5,10 +5,11 @@ import { newEventState, settingDescriptionState, settingNameState } from '../bot
 import {
 	botActionErrorCallback,
 	deleteExistingMessagesAndReply,
-	getEventDescriptionHtml
+	getEventDescriptionHtml,
+	sendNewEventMessage
 } from '../bot/utils.ts';
 import { eventCollection, getEvent } from '../db/mongo.ts';
-import { RSVPEvent, RSVPEventState } from '../db/types.ts';
+import { EventParticipant, RSVPEvent, RSVPEventState } from '../db/types.ts';
 import { logger } from '../logger.ts';
 
 export const bot = new TelegramBot(env.BOT_TOKEN);
@@ -56,9 +57,114 @@ bot.on('message', async (message: TelegramBot.Message) => {
 	}
 });
 
-bot.on('callback_query', (query: TelegramBot.CallbackQuery) => {
-	logger.info('Received callback: {query}', { query });
+bot.on('callback_query', async (query: TelegramBot.CallbackQuery) => {
+	const existingEvent: RSVPEvent | undefined =
+		query.message?.message_id && (await getEvent(query.message.chat.id, query.message.message_id));
+
+	if (!existingEvent) {
+		logger.debug('Could not find event or parse message: {message}', {
+			message: JSON.stringify(query)
+		});
+		return;
+	}
+
+	try {
+		match(Number(query.data))
+			.with(0, async () => await registerParticipant(query, existingEvent))
+			.with(1, async () => await removeParticipant(query, existingEvent));
+	} catch (error) {
+		botActionErrorCallback(error, bot, query.message);
+	}
 });
+
+const saveNewParticipantsAndNotify = async (
+	bot: TelegramBot,
+	query: TelegramBot.CallbackQuery,
+	event: RSVPEvent,
+	newParticipantsList: EventParticipant[],
+	newWaitingList: EventParticipant[]
+) => {
+	await eventCollection()
+		.findOneAndUpdate(
+			{ _id: event._id },
+			{
+				$set: {
+					participantsList: newParticipantsList,
+					waitlingList: newWaitingList
+				}
+			},
+			{ upsert: true, returnDocument: 'after' }
+		)
+		.then(async (updatedEvent) => {
+			if (!updatedEvent) {
+				throw `No event found to update, ${event._id}, ${JSON.stringify(query)}`;
+			}
+			// delete previous announcement
+			await bot.deleteMessage(query.message.chat.id, event.lastMessageId);
+			await sendNewEventMessage(
+				bot,
+				query.message.chat.id,
+				updatedEvent,
+				getEventDescriptionHtml(updatedEvent),
+				botMessageInlineKeyboardOptions
+			);
+		});
+};
+
+const registerParticipant = async (query: TelegramBot.CallbackQuery, event: RSVPEvent) => {
+	// push participant
+	const newParticipant: EventParticipant = {
+		tgid: query.from.id,
+		firstName: query.from.first_name,
+		username: query.from.username
+	};
+	const allParticipants = [...(event.participantsList ?? []), ...(event.waitlingList ?? [])];
+	// avoid duplicates
+	if (allParticipants.map(({ tgid }) => tgid).includes(newParticipant.tgid)) {
+		// this participant is already there
+		return;
+	}
+	const newFullListOfParticipants = [...allParticipants, newParticipant];
+	const maxParticipants = event.participantLimit ?? 0; // typesafety only
+
+	const newParticipantsList = maxParticipants
+		? newFullListOfParticipants.splice(0, maxParticipants)
+		: newFullListOfParticipants;
+
+	const newWaitingList = maxParticipants ? [] : newFullListOfParticipants.splice(maxParticipants);
+	await saveNewParticipantsAndNotify(bot, query, event, newParticipantsList, newWaitingList).catch(
+		(error) => botActionErrorCallback(error, bot, query.message)
+	);
+};
+
+const removeParticipant = async (query: TelegramBot.CallbackQuery, event: RSVPEvent) => {
+	const participantToRemove: EventParticipant = {
+		tgid: query.from.id,
+		firstName: query.from.first_name,
+		username: query.from.username
+	};
+
+	const allParticipants = [...(event.participantsList ?? []), ...(event.waitlingList ?? [])];
+	// nothing to remove
+	if (!allParticipants.map(({ tgid }) => tgid).includes(participantToRemove.tgid)) {
+		// this participant is already there
+		return;
+	}
+	const newFullListOfParticipants = allParticipants.filter(
+		(participant) => participant.tgid !== participantToRemove.tgid
+	);
+
+	const maxParticipants = event.participantLimit ?? 0; // typesafety only
+
+	const newParticipantsList = maxParticipants
+		? newFullListOfParticipants.splice(0, maxParticipants)
+		: newFullListOfParticipants;
+
+	const newWaitingList = maxParticipants ? [] : newFullListOfParticipants.splice(maxParticipants);
+	await saveNewParticipantsAndNotify(bot, query, event, newParticipantsList, newWaitingList).catch(
+		(error) => botActionErrorCallback(error, bot, query.message)
+	);
+};
 
 const botMessageTextOptions = JSON.stringify({
 	force_reply: true
@@ -67,8 +173,8 @@ const botMessageTextOptions = JSON.stringify({
 const botMessageInlineKeyboardOptions = JSON.stringify({
 	inline_keyboard: [
 		[
-			{ text: 'Yey', callback_data: 'yay' },
-			{ text: 'Nay', callback_data: 'nay' }
+			{ text: "I'm in!", callback_data: 0 },
+			{ text: 'Pass', callback_data: 1 }
 		]
 	],
 	force_reply: true

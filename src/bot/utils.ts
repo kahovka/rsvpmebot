@@ -1,7 +1,7 @@
 import TelegramBot from 'npm:node-telegram-bot-api';
 import { match } from 'npm:ts-pattern@^5.6.2';
 import { eventCollection } from '../db/mongo.ts';
-import { RSVPEvent, RSVPEventState } from '../db/types.ts';
+import { EventParticipant, RSVPEvent, RSVPEventState } from '../db/types.ts';
 import { logger } from '../logger.ts';
 import {
 	settingDescriptionState,
@@ -9,8 +9,27 @@ import {
 	settingParticipantLimitState
 } from './botStates.ts';
 
+const getParticipantDisplayName = (participant: EventParticipant) =>
+	`${participant.firstName} (${participant.username})`;
+
 export const getEventDescriptionHtml = (event: RSVPEvent) => {
-	return event.name + '\n' + event.description + '\n' + `Participants: ${event.participantLimit}`;
+	return (
+		event.name +
+		'\n' +
+		event.description +
+		'\n' +
+		`Participants limit: ${event.participantLimit}` +
+		'\n' +
+		'Participants' +
+		'\n' +
+		event.participantsList
+			?.map((participant) => getParticipantDisplayName(participant))
+			?.join('\n') +
+		'\n' +
+		'Waiting list:' +
+		'\n' +
+		event.waitlingList?.map((participant) => getParticipantDisplayName(participant))?.join('\n')
+	);
 };
 
 export const getEventNextState = (event: RSVPEvent): RSVPEventState => {
@@ -43,8 +62,18 @@ export const deleteExistingMessagesAndReply = async (
 	await bot.deleteMessage(message.chat.id, event.lastMessageId);
 	await bot.deleteMessage(message.chat.id, message.message_id);
 
+	await sendNewEventMessage(bot, message.chat.id, event, messageToSend, replyMarkup);
+};
+
+export const sendNewEventMessage = async (
+	bot: TelegramBot,
+	chatId: number,
+	event: RSVPEvent,
+	messageToSend: string,
+	replyMarkup: string
+) => {
 	await bot
-		.sendMessage(message.chat.id, messageToSend, {
+		.sendMessage(chatId, messageToSend, {
 			...(replyMarkup && { reply_markup: replyMarkup }),
 			parse_mode: 'HTML'
 		})

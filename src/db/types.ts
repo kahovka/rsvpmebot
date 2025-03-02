@@ -8,6 +8,14 @@ export interface RSVPEvent {
 	name?: string;
 	description?: string;
 	participantLimit?: number;
+	participantsList?: EventParticipant[];
+	waitlingList?: EventParticipant[];
+}
+
+export interface EventParticipant {
+	tgid: number;
+	firstName: string;
+	username: string;
 }
 
 export enum RSVPEventState {
