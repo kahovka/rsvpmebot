@@ -1,5 +1,8 @@
 <script>
+	import EventCard from '$lib/components/eventCard.svelte';
+
 	let { data } = $props();
+	let { events } = data;
 </script>
 
 <h1>Hello and welcome to my site!</h1>
@@ -7,12 +10,9 @@
 <div class="centered">
 	<h1>New Messages</h1>
 
-	<ul class="messages">
-		{JSON.stringify(data)}
-		{#each data.events as event}
-			<li>
-				<p>{event.content}</p>
-			</li>
+	<div class="grid max-w-4xl grid-cols-3 gap-4">
+		{#each events as event}
+			<EventCard {event} />
 		{/each}
-	</ul>
+	</div>
 </div>

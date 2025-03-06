@@ -8,11 +8,11 @@ export interface RSVPEvent {
 	name?: string;
 	description?: string;
 	participantLimit?: number;
-	participantsList?: EventParticipant[];
-	waitlingList?: EventParticipant[];
+	participantsList?: RSVPEventParticipant[];
+	waitlingList?: RSVPEventParticipant[];
 }
 
-export interface EventParticipant {
+export interface RSVPEventParticipant {
 	tgid: number;
 	firstName: string;
 	username: string;

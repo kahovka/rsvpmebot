@@ -1,5 +1,5 @@
 import TelegramBot from 'npm:node-telegram-bot-api';
-import { EventParticipant, RSVPEvent } from '../db/types.ts';
+import { RSVPEventParticipant, RSVPEvent } from '../db/types.ts';
 import { eventCollection } from '../db/mongo.ts';
 import {
 	botActionErrorCallback,
@@ -13,8 +13,8 @@ const saveNewParticipantsAndNotify = async (
 	bot: TelegramBot,
 	query: TelegramBot.CallbackQuery,
 	event: RSVPEvent,
-	newParticipantsList: EventParticipant[],
-	newWaitingList: EventParticipant[]
+	newParticipantsList: RSVPEventParticipant[],
+	newWaitingList: RSVPEventParticipant[]
 ) => {
 	await eventCollection()
 		.findOneAndUpdate(
@@ -49,7 +49,7 @@ export const registerParticipant = async (
 	event: RSVPEvent
 ) => {
 	// push participant
-	const newParticipant: EventParticipant = {
+	const newParticipant: RSVPEventParticipant = {
 		tgid: query.from.id,
 		firstName: query.from.first_name,
 		username: query.from.username
@@ -78,7 +78,7 @@ export const removeParticipant = async (
 	query: TelegramBot.CallbackQuery,
 	event: RSVPEvent
 ) => {
-	const participantToRemove: EventParticipant = {
+	const participantToRemove: RSVPEventParticipant = {
 		tgid: query.from.id,
 		firstName: query.from.first_name,
 		username: query.from.username
