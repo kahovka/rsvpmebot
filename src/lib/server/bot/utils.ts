@@ -2,7 +2,7 @@ import TelegramBot from 'npm:node-telegram-bot-api';
 import { match } from 'npm:ts-pattern@^5.6.2';
 import { eventCollection } from '../db/mongo.ts';
 import { EventParticipant, RSVPEvent, RSVPEventState } from '../db/types.ts';
-import { logger } from '../logger.ts';
+import { logger } from '../../../logger.ts';
 import {
 	settingDescriptionState,
 	settingNameState,

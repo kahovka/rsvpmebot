@@ -1,3 +1,3 @@
-import { connectToDb } from './db/mongo.ts';
+import { connectToDb } from './lib/server/db/mongo.ts';
 
 connectToDb();

@@ -1,6 +1,6 @@
 import { MongoClient } from 'npm:mongodb';
 import { env } from '$env/dynamic/private';
-import { logger } from '../logger.ts';
+import { logger } from '../../../logger.ts';
 import { RSVPEvent } from './types.ts';
 
 const client = new MongoClient(env.MONGO_DB_URL ?? 'mongodb://127.0.0.1:27017');
