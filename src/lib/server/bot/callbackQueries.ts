@@ -11,7 +11,7 @@ import { botMessageInlineKeyboardOptions, botMessageTextOptions } from './misc.t
 
 const saveNewParticipantsAndNotify = async (
 	bot: TelegramBot,
-	query: TelegramBot.CallbackQuery,
+	message: TelegramBot.Message,
 	event: RSVPEvent,
 	newParticipantsList: RSVPEventParticipant[],
 	newWaitingList: RSVPEventParticipant[]
@@ -29,13 +29,13 @@ const saveNewParticipantsAndNotify = async (
 		)
 		.then(async (updatedEvent) => {
 			if (!updatedEvent) {
-				throw `No event found to update, ${event._id}, ${JSON.stringify(query)}`;
+				throw `No event found to update, ${event._id}, ${JSON.stringify(message)}`;
 			}
 			// delete previous announcement
-			await bot.deleteMessage(query.message.chat.id, event.lastMessageId);
+			await bot.deleteMessage(message.chat.id, event.lastMessageId);
 			await sendNewEventMessage(
 				bot,
-				query.message.chat.id,
+				message.chat.id,
 				updatedEvent,
 				getEventDescriptionHtml(updatedEvent),
 				botMessageInlineKeyboardOptions

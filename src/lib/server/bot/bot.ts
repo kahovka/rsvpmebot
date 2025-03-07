@@ -4,7 +4,11 @@ import { match } from 'npm:ts-pattern';
 import { logger } from '../../../logger.ts';
 import { getEvent } from '../db/mongo.ts';
 import { RSVPEventState } from '../db/types.ts';
-import { registerParticipant, removeParticipant } from './callbackQueries.ts';
+import {
+	registerParticipant,
+	registerParticipantPlusOne,
+	removeParticipant
+} from './callbackQueries.ts';
 import { botActionErrorCallback } from './utils.ts';
 import {
 	createNewEvent,
