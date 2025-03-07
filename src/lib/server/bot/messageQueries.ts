@@ -1,14 +1,13 @@
 import TelegramBot from 'npm:node-telegram-bot-api';
+import { eventCollection } from '../db/mongo.ts';
+import { RSVPEvent } from '../db/types.ts';
 import { newEventState, settingDescriptionState, settingNameState } from './botStates.ts';
 import { botMessageInlineKeyboardOptions, botMessageTextOptions } from './misc.ts';
-import { eventCollection } from '../db/mongo.ts';
 import {
 	botActionErrorCallback,
 	deleteExistingMessagesAndReply,
 	getEventDescriptionHtml
 } from './utils.ts';
-import { RSVPEvent } from '../db/types.ts';
-import { logger } from '../../../logger.ts';
 
 export const createNewEvent = async (bot: TelegramBot, message: TelegramBot.Message) => {
 	await bot.deleteMessage(message.chat.id, message.message_id);
@@ -104,12 +103,11 @@ export const setParticipantLimit = async (
 			if (!updatedEvent) {
 				throw `No event found to update, ${event._id}, ${JSON.stringify(message)}`;
 			}
-			logger.debug('Debugging event {event}', { event: updatedEvent });
 			await deleteExistingMessagesAndReply(
 				bot,
 				message,
 				updatedEvent,
-				getEventDescriptionHtml(event),
+				getEventDescriptionHtml(updatedEvent),
 				botMessageInlineKeyboardOptions
 			);
 		})

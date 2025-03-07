@@ -33,6 +33,7 @@ export const getEventNextState = (event: RSVPEvent): RSVPEventState => {
 		.with(RSVPEventState.NewEvent, () => settingNameState.nextState)
 		.with(RSVPEventState.NameSet, () => settingDescriptionState.nextState)
 		.with(RSVPEventState.DescriptionSet, () => settingParticipantLimitState.nextState)
+		.with(RSVPEventState.Polling, () => RSVPEventState.Polling)
 		.otherwise(() => RSVPEventState.NewEvent);
 };
 
