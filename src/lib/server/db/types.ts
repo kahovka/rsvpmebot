@@ -15,7 +15,8 @@ export interface RSVPEvent {
 export interface RSVPEventParticipant {
 	tgid: number;
 	firstName: string;
-	username: string;
+	username: string | undefined;
+	isPlusOne: boolean;
 }
 
 export enum RSVPEventState {

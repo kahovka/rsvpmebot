@@ -79,7 +79,8 @@ bot.on('callback_query', async (query: TelegramBot.CallbackQuery) => {
 	try {
 		match(Number(query.data))
 			.with(0, async () => await registerParticipant(bot, query, existingEvent))
-			.with(1, async () => await removeParticipant(bot, query, existingEvent));
+			.with(1, async () => await registerParticipantPlusOne(bot, query, existingEvent))
+			.with(2, async () => await removeParticipant(bot, query, existingEvent));
 	} catch (error) {
 		botActionErrorCallback(error, bot, query.message);
 	}

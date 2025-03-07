@@ -10,7 +10,7 @@ import {
 } from './botStates.ts';
 
 export const getParticipantDisplayName = (participant: RSVPEventParticipant) =>
-	`${participant.firstName} (${participant.username})`;
+	`${participant.firstName} (${participant.username ?? ''})`;
 
 export const getEventDescriptionHtml = (event: RSVPEvent) => {
 	const allParticipants = event.participantsList

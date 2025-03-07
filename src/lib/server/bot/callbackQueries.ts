@@ -52,7 +52,8 @@ export const registerParticipant = async (
 	const newParticipant: RSVPEventParticipant = {
 		tgid: query.from.id,
 		firstName: query.from.first_name,
-		username: query.from.username
+		username: query.from.username,
+		isPlusOne: false
 	};
 	const allParticipants = [...(event.participantsList ?? []), ...(event.waitlingList ?? [])];
 	// avoid duplicates
@@ -73,26 +74,70 @@ export const registerParticipant = async (
 	);
 };
 
+export const registerParticipantPlusOne = async (
+	bot: TelegramBot,
+	query: TelegramBot.CallbackQuery,
+	event: RSVPEvent
+) => {
+	const participantId = query.from.id;
+	const allParticipants = [...(event.participantsList ?? []), ...(event.waitlingList ?? [])];
+	// avoid duplicates
+	if (allParticipants.map(({ tgid }) => tgid).includes(participantId)) {
+		// this participant is already there and can add plus one
+	} else {
+		query.message &&
+			(await bot.sendMessage(
+				query.message.chat.id,
+				'You can only bring someone if you come yourself ;)'
+			));
+	}
+	const newParticipant = {
+		tgid: query.from.id,
+		firstName: `${query.from.first_name} - +1`,
+		username: query.from.username,
+		isPlusOne: true
+	};
+	const newFullListOfParticipants = [...allParticipants, newParticipant];
+	const maxParticipants = event.participantLimit ?? 0; // typesafety only
+
+	const newParticipantsList = maxParticipants
+		? newFullListOfParticipants.splice(0, maxParticipants)
+		: newFullListOfParticipants;
+
+	const newWaitingList = maxParticipants ? [] : newFullListOfParticipants.splice(maxParticipants);
+	await saveNewParticipantsAndNotify(bot, query, event, newParticipantsList, newWaitingList).catch(
+		(error) => botActionErrorCallback(error, bot, query.message)
+	);
+};
+
 export const removeParticipant = async (
 	bot: TelegramBot,
 	query: TelegramBot.CallbackQuery,
 	event: RSVPEvent
 ) => {
-	const participantToRemove: RSVPEventParticipant = {
-		tgid: query.from.id,
-		firstName: query.from.first_name,
-		username: query.from.username
-	};
+	const participantToRemoveId = query.from.id;
 
 	const allParticipants = [...(event.participantsList ?? []), ...(event.waitlingList ?? [])];
 	// nothing to remove
-	if (!allParticipants.map(({ tgid }) => tgid).includes(participantToRemove.tgid)) {
+	if (!allParticipants.map(({ tgid }) => tgid).includes(participantToRemoveId)) {
 		// this participant is already there
 		return;
 	}
-	const newFullListOfParticipants = allParticipants.filter(
-		(participant) => participant.tgid !== participantToRemove.tgid
+
+	const associatedParticipants = allParticipants.filter(
+		(part) => part.tgid === participantToRemoveId
 	);
+	let newFullListOfParticipants;
+	// if has plus one, first remove plus one
+	if (associatedParticipants.some((participant) => participant.isPlusOne)) {
+		newFullListOfParticipants = allParticipants.filter(
+			(participant) => participant.tgid !== participantToRemoveId && participant.isPlusOne === true
+		);
+	} else {
+		newFullListOfParticipants = allParticipants.filter(
+			(participant) => participant.tgid !== participantToRemoveId
+		);
+	}
 
 	const maxParticipants = event.participantLimit ?? 0; // typesafety only
 
