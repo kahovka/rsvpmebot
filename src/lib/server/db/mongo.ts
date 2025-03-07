@@ -1,4 +1,4 @@
-import { MongoClient } from 'mongodb';
+import { MongoClient } from 'npm:mongodb';
 import { env } from '$env/dynamic/private';
 import { logger } from '../../../logger.ts';
 import { RSVPEvent } from './types.ts';
