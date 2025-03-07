@@ -69,9 +69,14 @@ export const registerParticipant = async (
 		: newFullListOfParticipants;
 
 	const newWaitingList = maxParticipants ? [] : newFullListOfParticipants.splice(maxParticipants);
-	await saveNewParticipantsAndNotify(bot, query, event, newParticipantsList, newWaitingList).catch(
-		(error) => botActionErrorCallback(error, bot, query.message)
-	);
+	query.message &&
+		(await saveNewParticipantsAndNotify(
+			bot,
+			query.message,
+			event,
+			newParticipantsList,
+			newWaitingList
+		).catch((error) => botActionErrorCallback(error, bot, query.message)));
 };
 
 export const registerParticipantPlusOne = async (
@@ -105,9 +110,14 @@ export const registerParticipantPlusOne = async (
 		: newFullListOfParticipants;
 
 	const newWaitingList = maxParticipants ? [] : newFullListOfParticipants.splice(maxParticipants);
-	await saveNewParticipantsAndNotify(bot, query, event, newParticipantsList, newWaitingList).catch(
-		(error) => botActionErrorCallback(error, bot, query.message)
-	);
+	query.message &&
+		(await saveNewParticipantsAndNotify(
+			bot,
+			query.message,
+			event,
+			newParticipantsList,
+			newWaitingList
+		).catch((error) => botActionErrorCallback(error, bot, query.message)));
 };
 
 export const removeParticipant = async (
@@ -146,20 +156,28 @@ export const removeParticipant = async (
 		: newFullListOfParticipants;
 
 	const newWaitingList = maxParticipants ? [] : newFullListOfParticipants.splice(maxParticipants);
-	await saveNewParticipantsAndNotify(bot, query, event, newParticipantsList, newWaitingList)
-		.then(async () => {
-			const newParticipantsOntheBlock = newParticipantsList.filter(
-				(participant) => !event.participantsList?.map(({ tgid }) => tgid).includes(participant.tgid)
-			);
-			if (newParticipantsOntheBlock.length > 0) {
-				await bot.sendMessage(
-					query.message.chat.id,
-					`Hello ${getParticipantDisplayName(newParticipantsOntheBlock[0])}, there is a spot for you now!`,
-					{
-						reply_markup: botMessageTextOptions
-					}
+	query.message &&
+		(await saveNewParticipantsAndNotify(
+			bot,
+			query.message,
+			event,
+			newParticipantsList,
+			newWaitingList
+		)
+			.then(async () => {
+				const newParticipantsOntheBlock = newParticipantsList.filter(
+					(participant) =>
+						!event.participantsList?.map(({ tgid }) => tgid).includes(participant.tgid)
 				);
-			}
-		})
-		.catch((error) => botActionErrorCallback(error, bot, query.message));
+				if (newParticipantsOntheBlock.length > 0) {
+					await bot.sendMessage(
+						query.message.chat.id,
+						`Hello ${getParticipantDisplayName(newParticipantsOntheBlock[0])}, there is a spot for you now!`,
+						{
+							reply_markup: botMessageTextOptions
+						}
+					);
+				}
+			})
+			.catch((error) => botActionErrorCallback(error, bot, query.message)));
 };
