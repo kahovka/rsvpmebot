@@ -3,7 +3,7 @@ import TelegramBot from 'npm:node-telegram-bot-api';
 import { match } from 'npm:ts-pattern';
 import { logger } from '../../../logger.ts';
 import { getEvent } from '../db/mongo.ts';
-import { RSVPEvent, RSVPEventState } from '../db/types.ts';
+import { RSVPEventState } from '../db/types.ts';
 import { registerParticipant, removeParticipant } from './callbackQueries.ts';
 import { botActionErrorCallback } from './utils.ts';
 import {
@@ -13,7 +13,7 @@ import {
 	setParticipantLimit
 } from './messageQueries.ts';
 
-export const bot = new TelegramBot(env.BOT_TOKEN);
+export const bot = new TelegramBot(env.BOT_TOKEN ?? 'no token provided');
 
 // match-all debug
 bot.onText(/.*/, (message: TelegramBot.Message) => {
@@ -26,7 +26,7 @@ bot.onText('\/event', async (message: TelegramBot.Message) => {
 
 bot.on('message', async (message: TelegramBot.Message) => {
 	try {
-		const existingEvent: RSVPEvent | undefined =
+		const existingEvent =
 			message.reply_to_message &&
 			(await getEvent(message.chat.id, message.reply_to_message.message_id));
 
@@ -59,13 +59,20 @@ bot.on('message', async (message: TelegramBot.Message) => {
 });
 
 bot.on('callback_query', async (query: TelegramBot.CallbackQuery) => {
-	const existingEvent: RSVPEvent | undefined =
-		query.message?.message_id && (await getEvent(query.message.chat.id, query.message.message_id));
+	if (!query.message || !query.data) {
+		logger.error('Registered unprossesable callback query: {query}', { query });
+		return;
+	}
+	const existingEvent = await getEvent(query.message.chat.id, query.message.message_id);
 
-	if (!existingEvent) {
-		logger.debug('Could not find event or parse message: {message}', {
-			message: JSON.stringify(query)
-		});
+	if (!existingEvent || existingEvent.state !== RSVPEventState.Polling) {
+		logger.error(
+			'Could not find event or event is not in the polling state: {eventId}, requested by message: {message}',
+			{
+				message: JSON.stringify(query),
+				eventId: existingEvent?._id
+			}
+		);
 		return;
 	}
 

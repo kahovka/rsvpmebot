@@ -1,8 +1,11 @@
 {
   "version": "4",
   "specifiers": {
+    "jsr:@std/assert@*": "1.0.11",
+    "jsr:@std/internal@^1.0.5": "1.0.5",
     "npm:@eslint/compat@^1.2.5": "1.2.7_eslint@9.20.1",
     "npm:@eslint/js@^9.18.0": "9.20.0",
+    "npm:@faker-js/faker@*": "9.6.0",
     "npm:@logtape/logtape@~0.8.2": "0.8.2",
     "npm:@sveltejs/adapter-node@^5.2.12": "5.2.12_@sveltejs+kit@2.17.2__@sveltejs+vite-plugin-svelte@5.0.3___svelte@5.20.2____acorn@8.14.0___vite@6.1.1____lightningcss@1.29.1__svelte@5.20.2___acorn@8.14.0__vite@6.1.1___lightningcss@1.29.1_rollup@4.34.8_@sveltejs+vite-plugin-svelte@5.0.3__svelte@5.20.2___acorn@8.14.0__vite@6.1.1___lightningcss@1.29.1_svelte@5.20.2__acorn@8.14.0_vite@6.1.1__lightningcss@1.29.1",
     "npm:@sveltejs/kit@^2.16.0": "2.17.2_@sveltejs+vite-plugin-svelte@5.0.3__svelte@5.20.2___acorn@8.14.0__vite@6.1.1___lightningcss@1.29.1_svelte@5.20.2__acorn@8.14.0_vite@6.1.1__lightningcss@1.29.1",
@@ -39,6 +42,17 @@
     "npm:vite@6": "6.1.1_@types+node@22.5.4",
     "npm:vite@6.1.1": "6.1.1_@types+node@22.5.4",
     "npm:vitest@3": "3.0.6_jsdom@25.0.1_vite@6.1.1"
+  },
+  "jsr": {
+    "@std/assert@1.0.11": {
+      "integrity": "2461ef3c368fe88bc60e186e7744a93112f16fd110022e113a0849e94d1c83c1",
+      "dependencies": [
+        "jsr:@std/internal"
+      ]
+    },
+    "@std/internal@1.0.5": {
+      "integrity": "54a546004f769c1ac9e025abd15a76b6671ddc9687e2313b67376125650dc7ba"
+    }
   },
   "npm": {
     "@adobe/css-tools@4.4.2": {
@@ -276,6 +290,9 @@
         "@eslint/core@0.12.0",
         "levn"
       ]
+    },
+    "@faker-js/faker@9.6.0": {
+      "integrity": "sha512-3vm4by+B5lvsFPSyep3ELWmZfE3kicDtmemVpuwl1yH7tqtnHdsA6hG8fbXedMVdkzgtvzWoRgjSB4Q+FHnZiw=="
     },
     "@floating-ui/core@1.6.9": {
       "integrity": "sha512-uMXCuQ3BItDUbAMhIXw7UPXRfAlOAvZzdK9BWpE60MCn+Svt3aLn9jsPTi/WNGlRUu2uI0v5S7JiIUsbsvh3fw==",
@@ -3394,8 +3411,10 @@
   },
   "workspace": {
     "dependencies": [
+      "npm:@faker-js/faker@*",
       "npm:@logtape/logtape@~0.8.2",
       "npm:dotenv@*",
+      "npm:mongodb@*",
       "npm:node-telegram-bot-api@*"
     ],
     "packageJson": {

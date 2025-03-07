@@ -1,5 +1,5 @@
-import TelegramBot from 'npm:node-telegram-bot-api';
-import { match } from 'npm:ts-pattern@^5.6.2';
+import TelegramBot from 'node-telegram-bot-api';
+import { match } from 'ts-pattern';
 import { eventCollection } from '../db/mongo.ts';
 import { RSVPEventParticipant, RSVPEvent, RSVPEventState } from '../db/types.ts';
 import { logger } from '../../../logger.ts';
@@ -13,23 +13,19 @@ export const getParticipantDisplayName = (participant: RSVPEventParticipant) =>
 	`${participant.firstName} (${participant.username})`;
 
 export const getEventDescriptionHtml = (event: RSVPEvent) => {
-	return (
-		event.name +
-		'\n' +
-		event.description +
-		'\n' +
-		`Participants limit: ${event.participantLimit}` +
-		'\n' +
-		'Participants' +
-		'\n' +
-		event.participantsList
-			?.map((participant) => getParticipantDisplayName(participant))
-			?.join('\n') +
-		'\n' +
-		'Waiting list:' +
-		'\n' +
-		event.waitlingList?.map((participant) => getParticipantDisplayName(participant))?.join('\n')
-	);
+	const allParticipants = event.participantsList
+		?.map((participant) => getParticipantDisplayName(participant))
+		?.join('<br>');
+	const allWaiting = event.waitlingList
+		?.map((participant) => getParticipantDisplayName(participant))
+		?.join('<br>');
+	return `
+		<p>${event.name ?? 'Your event'}</p>
+		<p><b>Description:</b> ${event.description ?? 'Your event description'}</p>
+		<p><b>Number of participants:</b> ${event.participantLimit}</p>
+		${event.participantsList && event.participantsList.length > 0 ? '<p><b>Participants:</b></p>' + allParticipants : ''}
+		${event.waitlingList && event.waitlingList.length > 0 ? '<p><b>Waiting:</b></p>' + allWaiting : ''}
+		`;
 };
 
 export const getEventNextState = (event: RSVPEvent): RSVPEventState => {

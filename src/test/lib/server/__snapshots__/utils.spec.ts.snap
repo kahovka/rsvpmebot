@@ -1,0 +1,11 @@
+// Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
+
+exports[`utils tests > simple test 1`] = `
+"
+		<p>indeed garrote</p>
+		<p><b>Description:</b> joyfully hence negative augment republican early sentimental generously from underachieve usually fashion if around famously</p>
+		<p><b>Number of participants:</b> 3</p>
+		<p><b>Participants:</b></p>Isom (@Breitenberg)<br>Willy (@Hyatt)<br>Alphonso (@Schulist)
+		<p><b>Waiting:</b></p>Winifred (@Wyman)<br>Lucious (@Labadie)
+		"
+`;

@@ -1,4 +1,4 @@
-import TelegramBot from 'npm:node-telegram-bot-api';
+import TelegramBot from 'node-telegram-bot-api';
 import { RSVPEventParticipant, RSVPEvent } from '../db/types.ts';
 import { eventCollection } from '../db/mongo.ts';
 import {
