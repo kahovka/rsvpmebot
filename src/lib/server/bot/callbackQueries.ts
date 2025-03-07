@@ -141,7 +141,9 @@ export const removeParticipant = async (
 	// if has plus one, first remove plus one
 	if (associatedParticipants.some((participant) => participant.isPlusOne)) {
 		newFullListOfParticipants = allParticipants.filter(
-			(participant) => participant.tgid !== participantToRemoveId && participant.isPlusOne === true
+			(participant) =>
+				participant.tgid !== participantToRemoveId ||
+				(participant.tgid === participantToRemoveId && participant.isPlusOne === false)
 		);
 	} else {
 		newFullListOfParticipants = allParticipants.filter(
