@@ -20,10 +20,10 @@ export const getEventDescriptionHtml = (event: RSVPEvent) => {
 		?.map((participant) => getParticipantDisplayName(participant))
 		?.join('\n');
 	return `
-		${event.name ?? 'Your event'}\n
-		<b>Description:</b> ${event.description ?? 'Your event description'}\n
-		<b>Number of participants:</b> ${event.participantLimit}\n
-		${event.participantsList && event.participantsList.length > 0 ? '<b>Participants:</b>\n' + allParticipants : ''}\n
+		<b>${event.name ?? 'Your event'}</b>
+		<b>Description:</b> ${event.description ?? 'Your event description'}
+		<b>Number of participants:</b> ${event.participantLimit}
+		${event.participantsList && event.participantsList.length > 0 ? '<b>Participants:</b>\n' + allParticipants : ''}
 		${event.waitlingList && event.waitlingList.length > 0 ? '<b>Waiting:</b>\n' + allWaiting : ''}
 		`;
 };
