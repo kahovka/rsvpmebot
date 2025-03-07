@@ -68,7 +68,7 @@ export const registerParticipant = async (
 		? newFullListOfParticipants.splice(0, maxParticipants)
 		: newFullListOfParticipants;
 
-	const newWaitingList = maxParticipants ? [] : newFullListOfParticipants.splice(maxParticipants);
+	const newWaitingList = maxParticipants ? newFullListOfParticipants.splice(maxParticipants) : [];
 	query.message &&
 		(await saveNewParticipantsAndNotify(
 			bot,
@@ -109,7 +109,7 @@ export const registerParticipantPlusOne = async (
 		? newFullListOfParticipants.splice(0, maxParticipants)
 		: newFullListOfParticipants;
 
-	const newWaitingList = maxParticipants ? [] : newFullListOfParticipants.splice(maxParticipants);
+	const newWaitingList = maxParticipants ? newFullListOfParticipants.splice(maxParticipants) : [];
 	query.message &&
 		(await saveNewParticipantsAndNotify(
 			bot,
