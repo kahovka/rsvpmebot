@@ -65,10 +65,12 @@ export const registerParticipant = async (
 	const maxParticipants = event.participantLimit ?? 0; // typesafety only
 
 	const newParticipantsList = maxParticipants
-		? newFullListOfParticipants.splice(0, maxParticipants)
+		? [...newFullListOfParticipants].splice(0, maxParticipants)
 		: newFullListOfParticipants;
 
-	const newWaitingList = maxParticipants ? newFullListOfParticipants.splice(maxParticipants) : [];
+	const newWaitingList = maxParticipants
+		? [...newFullListOfParticipants].splice(maxParticipants)
+		: [];
 	query.message &&
 		(await saveNewParticipantsAndNotify(
 			bot,
@@ -106,10 +108,12 @@ export const registerParticipantPlusOne = async (
 	const maxParticipants = event.participantLimit ?? 0; // typesafety only
 
 	const newParticipantsList = maxParticipants
-		? newFullListOfParticipants.splice(0, maxParticipants)
+		? [...newFullListOfParticipants].splice(0, maxParticipants)
 		: newFullListOfParticipants;
 
-	const newWaitingList = maxParticipants ? newFullListOfParticipants.splice(maxParticipants) : [];
+	const newWaitingList = maxParticipants
+		? [...newFullListOfParticipants].splice(maxParticipants)
+		: [];
 	query.message &&
 		(await saveNewParticipantsAndNotify(
 			bot,
