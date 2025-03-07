@@ -5,8 +5,9 @@ export const botMessageTextOptions = JSON.stringify({
 export const botMessageInlineKeyboardOptions = JSON.stringify({
 	inline_keyboard: [
 		[
-			{ text: "I'm in!", callback_data: 0 },
-			{ text: 'Pass', callback_data: 1 }
+			{ text: '👍', callback_data: 0 },
+			{ text: '➕1️', callback_data: 1 },
+			{ text: '❌', callback_data: 2 }
 		]
 	],
 	force_reply: true
