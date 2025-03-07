@@ -97,6 +97,7 @@ export const registerParticipantPlusOne = async (
 				query.message.chat.id,
 				'You can only bring someone if you come yourself ;)'
 			));
+		return;
 	}
 	const newParticipant = {
 		tgid: query.from.id,
