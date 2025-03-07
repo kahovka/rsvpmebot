@@ -10,6 +10,9 @@ import {
 } from './utils.ts';
 
 export const createNewEvent = async (bot: TelegramBot, message: TelegramBot.Message) => {
+	if (!message.from?.id) {
+		return;
+	}
 	await bot.deleteMessage(message.chat.id, message.message_id);
 	await bot
 		.sendMessage(message.chat.id, newEventState.messageToSend, {
@@ -18,6 +21,7 @@ export const createNewEvent = async (bot: TelegramBot, message: TelegramBot.Mess
 		.then((replyMessage: TelegramBot.Message) => {
 			eventCollection().insertOne({
 				chatId: message.chat.id,
+				ownerId: message.from.id,
 				lastMessageId: replyMessage.message_id,
 				state: newEventState.nextState
 			});
