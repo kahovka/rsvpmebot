@@ -98,7 +98,7 @@ export const registerParticipantPlusOne = async (
 	}
 	const newParticipant = {
 		tgid: query.from.id,
-		firstName: `${query.from.first_name} - +1`,
+		firstName: `${query.from.first_name} +1`,
 		username: query.from.username,
 		isPlusOne: true
 	};
