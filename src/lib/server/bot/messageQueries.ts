@@ -1,6 +1,6 @@
 import TelegramBot from 'npm:node-telegram-bot-api';
 import { eventCollection } from '../db/mongo.ts';
-import { RSVPEvent } from '../db/types.ts';
+import { RSVPEvent, RSVPEventState } from '../db/types.ts';
 import {
 	newEventState,
 	setDescriptionState,
@@ -12,7 +12,8 @@ import { botMessageInlineKeyboardOptions, botMessageTextOptions } from './misc.t
 import {
 	botActionErrorCallback,
 	deleteExistingMessagesAndReply,
-	getEventDescriptionHtml
+	getEventDescriptionHtml,
+	setEventState
 } from './utils.ts';
 import { BotTextMessage } from './schemata.ts';
 
@@ -27,7 +28,7 @@ export const createNewEvent = async (bot: TelegramBot, message: BotTextMessage) 
 				chatId: message.chat.id,
 				ownerId: message.from.id,
 				lastMessageId: replyMessage.message_id,
-				state: newEventState.nextState,
+				state: RSVPEventState.NewEvent,
 				lang: message.from.language_code ?? 'en'
 			});
 		})
@@ -56,6 +57,7 @@ export const setEventName = async (bot: TelegramBot, message: BotTextMessage, ev
 				setNameState.messageToSend(updatedEvent.lang),
 				botMessageTextOptions
 			);
+			await setEventState(event, RSVPEventState.NameSet);
 		})
 		.catch((error: unknown) => botActionErrorCallback(error, bot, message));
 };
@@ -86,6 +88,7 @@ export const setEventDescription = async (
 				setDescriptionState.messageToSend(updatedEvent.lang),
 				botMessageTextOptions
 			);
+			await setEventState(event, RSVPEventState.DescriptionSet);
 		})
 		.catch((error: unknown) => botActionErrorCallback(error, bot, message));
 };
@@ -117,6 +120,7 @@ export const setPlusOneOption = async (
 				setPlusOneState.messageToSend(updatedEvent.lang),
 				botMessageTextOptions
 			);
+			await setEventState(event, RSVPEventState.PlusOneSet);
 		})
 		.catch((error: unknown) => botActionErrorCallback(error, bot, message));
 };
@@ -141,7 +145,10 @@ export const setParticipantLimit = async (
 			if (!updatedEvent) {
 				throw `No event found to update, ${event._id}, ${JSON.stringify(message)}`;
 			}
+
 			if (participantLimit === 0) {
+				await setEventState(event, RSVPEventState.ParticipantLimitSet);
+				// do not sent message, we know waitlist is not needed
 				await setWaitlist(bot, { ...message, text: '' }, updatedEvent); // who needs a waiting list if you have unlimited participants?
 			} else {
 				await deleteExistingMessagesAndReply(
@@ -151,6 +158,7 @@ export const setParticipantLimit = async (
 					setParticipantLimitState.messageToSend(updatedEvent.lang),
 					botMessageTextOptions
 				);
+				await setEventState(event, RSVPEventState.ParticipantLimitSet);
 			}
 		})
 		.catch((error: unknown) => botActionErrorCallback(error, bot, message));
@@ -177,6 +185,7 @@ export const setWaitlist = async (bot: TelegramBot, message: BotTextMessage, eve
 				getEventDescriptionHtml(updatedEvent),
 				botMessageInlineKeyboardOptions(updatedEvent.lang, event.allowsPlusOne)
 			);
+			await setEventState(event, RSVPEventState.Polling);
 		})
 		.catch((error: unknown) => botActionErrorCallback(error, bot, message));
 };

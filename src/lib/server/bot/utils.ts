@@ -1,11 +1,17 @@
 import TelegramBot from 'npm:node-telegram-bot-api';
 import { match } from 'npm:ts-pattern';
-import { eventCollection } from '../db/mongo.ts';
-import { RSVPEventParticipant, RSVPEvent, RSVPEventState } from '../db/types.ts';
 import { logger } from '../../../logger.ts';
-import { setDescriptionState, setNameState, setParticipantLimitState } from './botStates.ts';
-import { BotTextMessage } from './schemata.ts';
 import { translate } from '../../i18n/translate.ts';
+import { eventCollection } from '../db/mongo.ts';
+import { RSVPEvent, RSVPEventParticipant, RSVPEventState } from '../db/types.ts';
+import {
+	setDescriptionState,
+	setNameState,
+	setParticipantLimitState,
+	setPlusOneState,
+	setWaitlist
+} from './botStates.ts';
+import { BotTextMessage } from './schemata.ts';
 
 export const getParticipantDisplayName = (participant: RSVPEventParticipant) =>
 	`${participant.firstName}${participant.username ? ' (' + participant.username + ')' : ''})`;
@@ -30,7 +36,9 @@ export const getEventNextState = (event: RSVPEvent): RSVPEventState => {
 	return match(event.state)
 		.with(RSVPEventState.NewEvent, () => setNameState.nextState)
 		.with(RSVPEventState.NameSet, () => setDescriptionState.nextState)
-		.with(RSVPEventState.DescriptionSet, () => setParticipantLimitState.nextState)
+		.with(RSVPEventState.DescriptionSet, () => setPlusOneState.nextState)
+		.with(RSVPEventState.PlusOneSet, () => setParticipantLimitState.nextState)
+		.with(RSVPEventState.ParticipantLimitSet, () => setWaitlist.nextState)
 		.with(RSVPEventState.Polling, () => RSVPEventState.Polling)
 		.otherwise(() => RSVPEventState.NewEvent);
 };
@@ -44,6 +52,18 @@ export const botActionErrorCallback = (
 	bot.sendMessage(
 		message.chat.id,
 		'Something went wrong, please try to response to the previous bot message again or start anew'
+	);
+};
+
+export const setEventState = async (event: RSVPEvent, nextState: RSVPEventState | undefined) => {
+	await eventCollection().updateOne(
+		{ _id: event._id },
+		{
+			$set: {
+				state: nextState ?? getEventNextState(event)
+			}
+		},
+		{ upsert: true }
 	);
 };
 
@@ -77,7 +97,6 @@ export const sendNewEventMessage = async (
 				{ _id: event._id },
 				{
 					$set: {
-						state: getEventNextState(event),
 						lastMessageId: replyMessage.message_id
 					}
 				},
