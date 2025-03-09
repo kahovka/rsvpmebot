@@ -8,7 +8,11 @@ import {
 	setParticipantLimitState,
 	setPlusOneState
 } from './botStates.ts';
-import { botMessageInlineKeyboardOptions, botMessageTextOptions } from './misc.ts';
+import {
+	botMessageInlineKeyboardOptions,
+	botMessageTextOptions,
+	ynKeyboardOptions
+} from './misc.ts';
 import {
 	botActionErrorCallback,
 	deleteExistingMessagesAndReply,
@@ -86,7 +90,7 @@ export const setEventDescription = async (
 				message,
 				updatedEvent,
 				setDescriptionState.messageToSend(updatedEvent.lang),
-				botMessageTextOptions
+				ynKeyboardOptions
 			);
 			await setEventState(event, RSVPEventState.DescriptionSet);
 		})
@@ -98,7 +102,7 @@ export const setPlusOneOption = async (
 	message: BotTextMessage,
 	event: RSVPEvent
 ) => {
-	const allowsPlusOne = message.text ? true : false;
+	const allowsPlusOne = message.text.includes('✅') ? true : false;
 	await eventCollection()
 		.findOneAndUpdate(
 			{ _id: event._id },
@@ -156,7 +160,7 @@ export const setParticipantLimit = async (
 					message,
 					updatedEvent,
 					setParticipantLimitState.messageToSend(updatedEvent.lang),
-					botMessageTextOptions
+					ynKeyboardOptions
 				);
 				await setEventState(event, RSVPEventState.ParticipantLimitSet);
 			}
@@ -165,7 +169,7 @@ export const setParticipantLimit = async (
 };
 
 export const setWaitlist = async (bot: TelegramBot, message: BotTextMessage, event: RSVPEvent) => {
-	const hasWaitList = message.text ? true : false;
+	const hasWaitList = message.text.includes('✅') ? true : false;
 	await eventCollection()
 		.findOneAndUpdate(
 			{ _id: event._id },

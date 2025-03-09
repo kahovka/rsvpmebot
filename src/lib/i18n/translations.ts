@@ -8,16 +8,16 @@ export const translations: { [key: string]: { [locale: string]: string } } = {
 		ru: 'У вашего мероприятия есть какие-нибудь подробности?'
 	},
 	'event.state.setDescription': {
-		en: 'Can people bring someone along? [Answer anything for yes]',
-		ru: 'Можно ли прийти с кем-то?  [Чтобы ответить "да", можно ответить что угодно]'
+		en: 'Can people bring someone along?',
+		ru: 'Можно ли прийти с кем-то?'
 	},
 	'event.state.setPlusOne': {
-		en: 'Does you event have participant limit?',
-		ru: 'Ограничено ли количество участников вашего мероприятия?'
+		en: 'Does you event have participant limit? [Enter number of participants, 0 or anything for no]',
+		ru: 'Ограничено ли количество участников вашего мероприятия? [Укажите число участников, или  0, чтобы отменить лимит если лимит не требуется]'
 	},
 	'event.state.setWaitlist': {
-		en: 'Does you event have a waiting list? [Answer anything for yes]',
-		ru: 'Есть ли у вашего мероприятия лист ожидания? [Чтобы ответить "да", можно ответить что угодно]'
+		en: 'Does you event have a waiting list?',
+		ru: 'Есть ли у вашего мероприятия лист ожидания?'
 	},
 	'event.getDescription.participantLimit': { en: 'Max Participants:', ru: 'Максимум участников:' },
 	'event.getDescription.particpants': { en: 'Participants:', ru: 'Участники:' },
