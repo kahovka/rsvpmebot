@@ -1,9 +1,10 @@
-import { number, z } from 'npm:zod';
+import { z } from 'npm:zod';
 
 const userSchema = z.object({
 	id: z.number(),
 	first_name: z.string(),
-	username: z.string().optional()
+	username: z.string().optional(),
+	language_code: z.string()
 });
 
 const chatSchema = z.object({

@@ -3,12 +3,9 @@ import { match } from 'npm:ts-pattern';
 import { eventCollection } from '../db/mongo.ts';
 import { RSVPEventParticipant, RSVPEvent, RSVPEventState } from '../db/types.ts';
 import { logger } from '../../../logger.ts';
-import {
-	settingDescriptionState,
-	settingNameState,
-	settingParticipantLimitState
-} from './botStates.ts';
+import { setDescriptionState, setNameState, setParticipantLimitState } from './botStates.ts';
 import { BotTextMessage } from './schemata.ts';
+import { translate } from '../../i18n/translate.ts';
 
 export const getParticipantDisplayName = (participant: RSVPEventParticipant) =>
 	`${participant.firstName} (${participant.username ?? ''})`;
@@ -22,18 +19,18 @@ export const getEventDescriptionHtml = (event: RSVPEvent) => {
 		?.join('\n');
 	return `
 		<b>${event.name ?? 'Your event'}</b>
-		<b>Description:</b> ${event.description ?? 'Your event description'}
-		<b>Number of participants:</b> ${event.participantLimit}
-		${event.participantsList && event.participantsList.length > 0 ? '<b>Participants:</b>\n' + allParticipants : ''}
-		${event.waitlingList && event.waitlingList.length > 0 ? '<b>Waiting:</b>\n' + allWaiting : ''}
+		${event.description ?? 'Your event description'}
+		${event.participantLimit}
+		${event.participantsList && event.participantsList.length > 0 ? '<b>' + translate('event.getDescription.partiticpants', event.lang) + '</b>\n' + allParticipants : ''}
+		${event.waitlingList && event.waitlingList.length > 0 ? '<b>' + translate('event.getDescription.waiting', event.lang) + '</b>\n' + allWaiting : ''}
 		`;
 };
 
 export const getEventNextState = (event: RSVPEvent): RSVPEventState => {
 	return match(event.state)
-		.with(RSVPEventState.NewEvent, () => settingNameState.nextState)
-		.with(RSVPEventState.NameSet, () => settingDescriptionState.nextState)
-		.with(RSVPEventState.DescriptionSet, () => settingParticipantLimitState.nextState)
+		.with(RSVPEventState.NewEvent, () => setNameState.nextState)
+		.with(RSVPEventState.NameSet, () => setDescriptionState.nextState)
+		.with(RSVPEventState.DescriptionSet, () => setParticipantLimitState.nextState)
 		.with(RSVPEventState.Polling, () => RSVPEventState.Polling)
 		.otherwise(() => RSVPEventState.NewEvent);
 };

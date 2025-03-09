@@ -1,31 +1,32 @@
+import { translate } from '../../i18n/translate.ts';
 import { RSVPEventState } from '../db/types.ts';
 
 interface BotState {
 	state: RSVPEventState;
 	nextState: RSVPEventState;
-	messageToSend: string;
+	messageToSend: (locale: string) => string;
 }
 
 export const newEventState: BotState = {
 	state: RSVPEventState.NewEvent,
 	nextState: RSVPEventState.NewEvent,
-	messageToSend: 'What is your event called?'
+	messageToSend: (locale: string) => translate('event.state.new', locale)
 };
 
-export const settingNameState: BotState = {
+export const setNameState: BotState = {
 	state: RSVPEventState.NewEvent,
 	nextState: RSVPEventState.NameSet,
-	messageToSend: 'Does your event have some description?'
+	messageToSend: (locale: string) => translate('event.state.setName', locale)
 };
 
-export const settingDescriptionState: BotState = {
+export const setDescriptionState: BotState = {
 	state: RSVPEventState.NameSet,
 	nextState: RSVPEventState.DescriptionSet,
-	messageToSend: 'Does you event have participant limit?'
+	messageToSend: (locale: string) => translate('event.state.setDescription', locale)
 };
 
-export const settingParticipantLimitState: BotState = {
+export const setParticipantLimitState: BotState = {
 	state: RSVPEventState.DescriptionSet,
 	nextState: RSVPEventState.Polling,
-	messageToSend: ''
+	messageToSend: () => ''
 };

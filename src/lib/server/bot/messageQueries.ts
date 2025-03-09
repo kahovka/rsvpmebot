@@ -1,7 +1,7 @@
 import TelegramBot from 'npm:node-telegram-bot-api';
 import { eventCollection } from '../db/mongo.ts';
 import { RSVPEvent } from '../db/types.ts';
-import { newEventState, settingDescriptionState, settingNameState } from './botStates.ts';
+import { newEventState, setDescriptionState, setNameState } from './botStates.ts';
 import { botMessageInlineKeyboardOptions, botMessageTextOptions } from './misc.ts';
 import {
 	botActionErrorCallback,
@@ -13,7 +13,7 @@ import { BotTextMessage } from './schemata.ts';
 export const createNewEvent = async (bot: TelegramBot, message: BotTextMessage) => {
 	await bot.deleteMessage(message.chat.id, message.message_id);
 	await bot
-		.sendMessage(message.chat.id, newEventState.messageToSend, {
+		.sendMessage(message.chat.id, newEventState.messageToSend(message.from.language_code), {
 			reply_markup: botMessageTextOptions
 		})
 		.then((replyMessage: TelegramBot.Message) => {
@@ -21,7 +21,8 @@ export const createNewEvent = async (bot: TelegramBot, message: BotTextMessage) 
 				chatId: message.chat.id,
 				ownerId: message.from.id,
 				lastMessageId: replyMessage.message_id,
-				state: newEventState.nextState
+				state: newEventState.nextState,
+				lang: message.from.language_code
 			});
 		})
 		.catch((error: unknown) => botActionErrorCallback(error, bot, message));
@@ -46,7 +47,7 @@ export const setEventName = async (bot: TelegramBot, message: BotTextMessage, ev
 				bot,
 				message,
 				updatedEvent,
-				settingNameState.messageToSend,
+				setNameState.messageToSend(updatedEvent.lang),
 				botMessageTextOptions
 			);
 		})
@@ -76,7 +77,7 @@ export const setEventDescription = async (
 				bot,
 				message,
 				updatedEvent,
-				settingDescriptionState.messageToSend,
+				setDescriptionState.messageToSend(updatedEvent.lang),
 				botMessageTextOptions
 			);
 		})
@@ -106,7 +107,7 @@ export const setParticipantLimit = async (
 				message,
 				updatedEvent,
 				getEventDescriptionHtml(updatedEvent),
-				botMessageInlineKeyboardOptions
+				botMessageInlineKeyboardOptions(updatedEvent.lang)
 			);
 		})
 		.catch((error: unknown) => botActionErrorCallback(error, bot, message));

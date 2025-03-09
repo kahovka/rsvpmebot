@@ -6,6 +6,7 @@ export interface RSVPEvent {
 	ownerId: number;
 	lastMessageId: number;
 	state: RSVPEventState;
+	lang: string;
 	name?: string;
 	description?: string;
 	participantLimit?: number;

@@ -39,7 +39,7 @@ const saveNewParticipantsAndNotify = async (
 				message.chat.id,
 				updatedEvent,
 				getEventDescriptionHtml(updatedEvent),
-				botMessageInlineKeyboardOptions
+				botMessageInlineKeyboardOptions(updatedEvent.lang)
 			);
 		});
 };
