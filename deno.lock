@@ -41,7 +41,8 @@
     "npm:typescript@5": "5.7.3",
     "npm:vite@6": "6.1.1_@types+node@22.5.4",
     "npm:vite@6.1.1": "6.1.1_@types+node@22.5.4",
-    "npm:vitest@3": "3.0.6_jsdom@25.0.1_vite@6.1.1"
+    "npm:vitest@3": "3.0.6_jsdom@25.0.1_vite@6.1.1",
+    "npm:zod@*": "3.24.2"
   },
   "jsr": {
     "@std/assert@1.0.11": {
@@ -3407,6 +3408,9 @@
     },
     "zimmerframe@1.1.2": {
       "integrity": "sha512-rAbqEGa8ovJy4pyBxZM70hg4pE6gDgaQ0Sl9M3enG3I0d6H4XSAM3GeNGLKnsBpuijUow064sf7ww1nutC5/3w=="
+    },
+    "zod@3.24.2": {
+      "integrity": "sha512-lY7CDW43ECgW9u1TcT3IoXHflywfVqDYze4waEz812jR/bZ8FHDsl7pFQoSZTz5N+2NqRXs8GBwnAwo3ZNxqhQ=="
     }
   },
   "workspace": {

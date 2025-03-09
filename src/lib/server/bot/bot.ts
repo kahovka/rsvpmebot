@@ -9,13 +9,13 @@ import {
 	registerParticipantPlusOne,
 	removeParticipant
 } from './callbackQueries.ts';
-import { botActionErrorCallback } from './utils.ts';
 import {
 	createNewEvent,
 	setEventDescription,
 	setEventName,
 	setParticipantLimit
 } from './messageQueries.ts';
+import { BotCallbackQuerySchema, BotTextMessageSchema } from './schemata.ts';
 
 export const bot = new TelegramBot(env.BOT_TOKEN ?? 'no token provided');
 
@@ -24,12 +24,18 @@ bot.onText(/.*/, (message: TelegramBot.Message) => {
 	logger.debug('Received something: {message}', { message });
 });
 
-bot.onText('\/event', async (message: TelegramBot.Message) => {
-	await createNewEvent(bot, message);
+bot.onText('\/event', async (raw_message: TelegramBot.Message) => {
+	try {
+		const message = BotTextMessageSchema.parse(raw_message);
+		await createNewEvent(bot, message);
+	} catch (e) {
+		console.error(e);
+	}
 });
 
-bot.on('message', async (message: TelegramBot.Message) => {
+bot.on('message', async (raw_message: TelegramBot.Message) => {
 	try {
+		const message = BotTextMessageSchema.parse(raw_message);
 		const existingEvent =
 			message.reply_to_message &&
 			(await getEvent(message.chat.id, message.reply_to_message.message_id));
@@ -62,30 +68,28 @@ bot.on('message', async (message: TelegramBot.Message) => {
 	}
 });
 
-bot.on('callback_query', async (query: TelegramBot.CallbackQuery) => {
-	if (!query.message || !query.data) {
-		logger.error('Registered unprossesable callback query: {query}', { query });
-		return;
-	}
-	const existingEvent = await getEvent(query.message.chat.id, query.message.message_id);
-
-	if (!existingEvent || existingEvent.state !== RSVPEventState.Polling) {
-		logger.error(
-			'Could not find event or event is not in the polling state: {eventId}, requested by message: {message}',
-			{
-				message: JSON.stringify(query),
-				eventId: existingEvent?._id
-			}
-		);
-		return;
-	}
-
+bot.on('callback_query', async (raw_query: TelegramBot.CallbackQuery) => {
 	try {
+		const query = BotCallbackQuerySchema.parse(raw_query);
+
+		const existingEvent = await getEvent(query.message.chat.id, query.message.message_id);
+
+		if (!existingEvent || existingEvent.state !== RSVPEventState.Polling) {
+			logger.error(
+				'Could not find event or event is not in the polling state: {eventId}, requested by message: {message}',
+				{
+					message: JSON.stringify(query),
+					eventId: existingEvent?._id
+				}
+			);
+			return;
+		}
+
 		match(Number(query.data))
 			.with(0, async () => await registerParticipant(bot, query, existingEvent))
 			.with(1, async () => await registerParticipantPlusOne(bot, query, existingEvent))
 			.with(2, async () => await removeParticipant(bot, query, existingEvent));
-	} catch (error) {
-		botActionErrorCallback(error, bot, query.message);
+	} catch (e) {
+		console.error(e);
 	}
 });

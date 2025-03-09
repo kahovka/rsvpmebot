@@ -8,11 +8,9 @@ import {
 	deleteExistingMessagesAndReply,
 	getEventDescriptionHtml
 } from './utils.ts';
+import { BotTextMessage } from './schemata.ts';
 
-export const createNewEvent = async (bot: TelegramBot, message: TelegramBot.Message) => {
-	if (!message.from?.id) {
-		return;
-	}
+export const createNewEvent = async (bot: TelegramBot, message: BotTextMessage) => {
 	await bot.deleteMessage(message.chat.id, message.message_id);
 	await bot
 		.sendMessage(message.chat.id, newEventState.messageToSend, {
@@ -29,11 +27,7 @@ export const createNewEvent = async (bot: TelegramBot, message: TelegramBot.Mess
 		.catch((error: unknown) => botActionErrorCallback(error, bot, message));
 };
 
-export const setEventName = async (
-	bot: TelegramBot,
-	message: TelegramBot.Message,
-	event: RSVPEvent
-) => {
+export const setEventName = async (bot: TelegramBot, message: BotTextMessage, event: RSVPEvent) => {
 	await eventCollection()
 		.findOneAndUpdate(
 			{ _id: event._id },
@@ -61,7 +55,7 @@ export const setEventName = async (
 
 export const setEventDescription = async (
 	bot: TelegramBot,
-	message: TelegramBot.Message,
+	message: BotTextMessage,
 	event: RSVPEvent
 ) => {
 	await eventCollection()
@@ -91,7 +85,7 @@ export const setEventDescription = async (
 
 export const setParticipantLimit = async (
 	bot: TelegramBot,
-	message: TelegramBot.Message,
+	message: BotTextMessage,
 	event: RSVPEvent
 ) => {
 	const participantLimit = Number(message.text) || 0;

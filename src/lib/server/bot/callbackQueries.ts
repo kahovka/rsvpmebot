@@ -8,10 +8,11 @@ import {
 	sendNewEventMessage
 } from './utils.ts';
 import { botMessageInlineKeyboardOptions, botMessageTextOptions } from './misc.ts';
+import { BotCallbackQuery, BotTextMessage } from './schemata.ts';
 
 const saveNewParticipantsAndNotify = async (
 	bot: TelegramBot,
-	message: TelegramBot.Message,
+	message: BotTextMessage,
 	event: RSVPEvent,
 	newParticipantsList: RSVPEventParticipant[],
 	newWaitingList: RSVPEventParticipant[]
@@ -45,7 +46,7 @@ const saveNewParticipantsAndNotify = async (
 
 export const registerParticipant = async (
 	bot: TelegramBot,
-	query: TelegramBot.CallbackQuery,
+	query: BotCallbackQuery,
 	event: RSVPEvent
 ) => {
 	// push participant
@@ -83,7 +84,7 @@ export const registerParticipant = async (
 
 export const registerParticipantPlusOne = async (
 	bot: TelegramBot,
-	query: TelegramBot.CallbackQuery,
+	query: BotCallbackQuery,
 	event: RSVPEvent
 ) => {
 	const participantId = query.from.id;
@@ -127,7 +128,7 @@ export const registerParticipantPlusOne = async (
 
 export const removeParticipant = async (
 	bot: TelegramBot,
-	query: TelegramBot.CallbackQuery,
+	query: BotCallbackQuery,
 	event: RSVPEvent
 ) => {
 	const participantToRemoveId = query.from.id;

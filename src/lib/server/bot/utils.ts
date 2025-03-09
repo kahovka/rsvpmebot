@@ -1,5 +1,5 @@
 import TelegramBot from 'npm:node-telegram-bot-api';
-import { match } from 'npm:ts-pattern@^5.6.2';
+import { match } from 'npm:ts-pattern';
 import { eventCollection } from '../db/mongo.ts';
 import { RSVPEventParticipant, RSVPEvent, RSVPEventState } from '../db/types.ts';
 import { logger } from '../../../logger.ts';
@@ -8,6 +8,7 @@ import {
 	settingNameState,
 	settingParticipantLimitState
 } from './botStates.ts';
+import { BotTextMessage } from './schemata.ts';
 
 export const getParticipantDisplayName = (participant: RSVPEventParticipant) =>
 	`${participant.firstName} (${participant.username ?? ''})`;
@@ -40,7 +41,7 @@ export const getEventNextState = (event: RSVPEvent): RSVPEventState => {
 export const botActionErrorCallback = (
 	error: unknown,
 	bot: TelegramBot,
-	message: TelegramBot.Message
+	message: BotTextMessage
 ) => {
 	logger.error('Failed ({error}) processing message: {message}', { message, error });
 	bot.sendMessage(
@@ -51,7 +52,7 @@ export const botActionErrorCallback = (
 
 export const deleteExistingMessagesAndReply = async (
 	bot: TelegramBot,
-	message: TelegramBot.Message,
+	message: BotTextMessage,
 	event: RSVPEvent,
 	messageToSend: string,
 	replyMarkup: string
