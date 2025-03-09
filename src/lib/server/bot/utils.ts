@@ -8,14 +8,14 @@ import { BotTextMessage } from './schemata.ts';
 import { translate } from '../../i18n/translate.ts';
 
 export const getParticipantDisplayName = (participant: RSVPEventParticipant) =>
-	`${participant.firstName} (${participant.username ?? ''})`;
+	`${participant.firstName}${participant.username ? ' (' + participant.username + ')' : ''})`;
 
 export const getEventDescriptionHtml = (event: RSVPEvent) => {
 	const allParticipants = event.participantsList
-		?.map((participant) => getParticipantDisplayName(participant))
+		?.map((participant, ind) => `${ind}. ${getParticipantDisplayName(participant)}`)
 		?.join('\n');
 	const allWaiting = event.waitlingList
-		?.map((participant) => getParticipantDisplayName(participant))
+		?.map((participant, ind) => `${ind}. ${getParticipantDisplayName(participant)}`)
 		?.join('\n');
 	return `
 		<b>${event.name ?? 'Your event'}</b>
