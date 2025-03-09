@@ -7,7 +7,7 @@ export const botMessageTextOptions = JSON.stringify({
 export const ynKeyboardOptions = JSON.stringify({
 	one_time_keyboard: true,
 	input_field_placeholder: '✅',
-	keyboard: [['✅'], ['❌']],
+	keyboard: [['✅', '❌']],
 	force_reply: true,
 	resize_keyboard: true
 });
