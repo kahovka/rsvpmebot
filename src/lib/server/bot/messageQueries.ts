@@ -5,7 +5,8 @@ import {
 	newEventState,
 	setDescriptionState,
 	setNameState,
-	setParticipantLimitState
+	setParticipantLimitState,
+	setPlusOneState
 } from './botStates.ts';
 import { botMessageInlineKeyboardOptions, botMessageTextOptions } from './misc.ts';
 import {
@@ -89,6 +90,37 @@ export const setEventDescription = async (
 		.catch((error: unknown) => botActionErrorCallback(error, bot, message));
 };
 
+export const setPlusOneOption = async (
+	bot: TelegramBot,
+	message: BotTextMessage,
+	event: RSVPEvent
+) => {
+	const allowsPlusOne = message.text ? true : false;
+	await eventCollection()
+		.findOneAndUpdate(
+			{ _id: event._id },
+			{
+				$set: {
+					allowsPlusOne
+				}
+			},
+			{ upsert: true, returnDocument: 'after' }
+		)
+		.then(async (updatedEvent) => {
+			if (!updatedEvent) {
+				throw `No event found to update, ${event._id}, ${JSON.stringify(message)}`;
+			}
+			await deleteExistingMessagesAndReply(
+				bot,
+				message,
+				updatedEvent,
+				setPlusOneState.messageToSend(updatedEvent.lang),
+				botMessageTextOptions
+			);
+		})
+		.catch((error: unknown) => botActionErrorCallback(error, bot, message));
+};
+
 export const setParticipantLimit = async (
 	bot: TelegramBot,
 	message: BotTextMessage,
@@ -143,7 +175,7 @@ export const setWaitlist = async (bot: TelegramBot, message: BotTextMessage, eve
 				message,
 				updatedEvent,
 				getEventDescriptionHtml(updatedEvent),
-				botMessageInlineKeyboardOptions(updatedEvent.lang)
+				botMessageInlineKeyboardOptions(updatedEvent.lang, event.allowsPlusOne)
 			);
 		})
 		.catch((error: unknown) => botActionErrorCallback(error, bot, message));

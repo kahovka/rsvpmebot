@@ -8,6 +8,7 @@ export interface RSVPEvent {
 	state: RSVPEventState;
 	lang: string;
 	hasWaitlist?: boolean;
+	allowsPlusOne?: boolean;
 	name?: string;
 	description?: string;
 	participantLimit?: number;
@@ -26,6 +27,8 @@ export enum RSVPEventState {
 	NewEvent = 'new',
 	NameSet = 'nameSet',
 	DescriptionSet = 'descriptionSet',
+	PlusOneSet = 'plusOneSet',
 	ParticipantLimitSet = 'numParticipantsSet',
+	WailistSet = 'waitlistSet',
 	Polling = 'polling'
 }

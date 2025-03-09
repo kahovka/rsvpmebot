@@ -14,6 +14,7 @@ import {
 	setEventDescription,
 	setEventName,
 	setParticipantLimit,
+	setPlusOneOption,
 	setWaitlist
 } from './messageQueries.ts';
 import { BotCallbackQuerySchema, BotTextMessageSchema } from './schemata.ts';
@@ -57,6 +58,10 @@ bot.on('message', async (raw_message: TelegramBot.Message) => {
 			.with(
 				RSVPEventState.DescriptionSet,
 				async () => await setParticipantLimit(bot, message, existingEvent)
+			)
+			.with(
+				RSVPEventState.PlusOneSet,
+				async () => await setPlusOneOption(bot, message, existingEvent)
 			)
 			.with(
 				RSVPEventState.ParticipantLimitSet,
