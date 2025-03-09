@@ -19,8 +19,8 @@ export const translations: { [key: string]: { [locale: string]: string } } = {
 		en: 'Does you event have a waiting list? [Answer anything for yes]',
 		ru: 'Есть ли у вашего мероприятия лист ожидания? [Чтобы ответить "да", можно ответить что угодно]'
 	},
-
-	'event.getDescription.partiticpants': { en: 'Participants:', ru: 'Участники:' },
+	'event.getDescription.participantLimit': { en: 'Max Participants:', ru: 'Максимум участников:' },
+	'event.getDescription.particpants': { en: 'Participants:', ru: 'Участники:' },
 	'event.getDescription.waiting': { en: 'Waiting list', ru: 'Очередь' },
 
 	'event.messages.eventIsFull': {

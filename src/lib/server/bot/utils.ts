@@ -14,7 +14,7 @@ import {
 import { BotTextMessage } from './schemata.ts';
 
 export const getParticipantDisplayName = (participant: RSVPEventParticipant) =>
-	`${participant.firstName}${participant.username ? ' (' + participant.username + ')' : ''})`;
+	`${participant.firstName}${participant.username ? ' (' + participant.username + ')' : ''}`;
 
 export const getEventDescriptionHtml = (event: RSVPEvent) => {
 	const allParticipants = event.participantsList
@@ -26,8 +26,8 @@ export const getEventDescriptionHtml = (event: RSVPEvent) => {
 	return `
 		<b>${event.name ?? 'Your event'}</b>
 		${event.description ?? 'Your event description'}
-		${event.participantLimit}
-		${event.participantsList && event.participantsList.length > 0 ? '<b>' + translate('event.getDescription.partiticpants', event.lang) + '</b>\n' + allParticipants : ''}
+		${event.participantLimit ? '<b>' + translate('event.getDescription.participantLimit', event.lang) + '</b> ' + event.participantLimit + '\n' : ''}
+		${event.participantsList && event.participantsList.length > 0 ? '<b>' + translate('event.getDescription.particpants', event.lang) + '</b>\n' + allParticipants : ''}
 		${event.waitlingList && event.waitlingList.length > 0 ? '<b>' + translate('event.getDescription.waiting', event.lang) + '</b>\n' + allWaiting : ''}
 		`;
 };
