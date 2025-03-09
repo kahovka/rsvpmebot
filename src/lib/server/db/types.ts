@@ -7,6 +7,7 @@ export interface RSVPEvent {
 	lastMessageId: number;
 	state: RSVPEventState;
 	lang: string;
+	hasWaitlist?: boolean;
 	name?: string;
 	description?: string;
 	participantLimit?: number;

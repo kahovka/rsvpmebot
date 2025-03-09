@@ -27,6 +27,12 @@ export const setDescriptionState: BotState = {
 
 export const setParticipantLimitState: BotState = {
 	state: RSVPEventState.DescriptionSet,
+	nextState: RSVPEventState.ParticipantLimitSet,
+	messageToSend: (locale: string) => translate('event.state.setWaitlist', locale)
+};
+
+export const setWaitlist: BotState = {
+	state: RSVPEventState.ParticipantLimitSet,
 	nextState: RSVPEventState.Polling,
 	messageToSend: () => ''
 };

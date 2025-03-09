@@ -13,7 +13,8 @@ import {
 	createNewEvent,
 	setEventDescription,
 	setEventName,
-	setParticipantLimit
+	setParticipantLimit,
+	setWaitlist
 } from './messageQueries.ts';
 import { BotCallbackQuerySchema, BotTextMessageSchema } from './schemata.ts';
 
@@ -56,6 +57,10 @@ bot.on('message', async (raw_message: TelegramBot.Message) => {
 			.with(
 				RSVPEventState.DescriptionSet,
 				async () => await setParticipantLimit(bot, message, existingEvent)
+			)
+			.with(
+				RSVPEventState.ParticipantLimitSet,
+				async () => await setWaitlist(bot, message, existingEvent)
 			)
 			.otherwise(() =>
 				logger.debug('Could not match event: {event} with message {message}', {

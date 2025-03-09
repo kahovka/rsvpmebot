@@ -1,7 +1,12 @@
 import TelegramBot from 'npm:node-telegram-bot-api';
 import { eventCollection } from '../db/mongo.ts';
 import { RSVPEvent } from '../db/types.ts';
-import { newEventState, setDescriptionState, setNameState } from './botStates.ts';
+import {
+	newEventState,
+	setDescriptionState,
+	setNameState,
+	setParticipantLimitState
+} from './botStates.ts';
 import { botMessageInlineKeyboardOptions, botMessageTextOptions } from './misc.ts';
 import {
 	botActionErrorCallback,
@@ -94,7 +99,38 @@ export const setParticipantLimit = async (
 		.findOneAndUpdate(
 			{ _id: event._id },
 			{
-				$set: { participantLimit }
+				$set: {
+					participantLimit
+				}
+			},
+			{ upsert: true, returnDocument: 'after' }
+		)
+		.then(async (updatedEvent) => {
+			if (!updatedEvent) {
+				throw `No event found to update, ${event._id}, ${JSON.stringify(message)}`;
+			}
+			if (participantLimit === 0) {
+				await setWaitlist(bot, { ...message, text: '' }, updatedEvent); // who needs a waiting list if you have unlimited participants?
+			} else {
+				await deleteExistingMessagesAndReply(
+					bot,
+					message,
+					updatedEvent,
+					setParticipantLimitState.messageToSend(updatedEvent.lang),
+					botMessageTextOptions
+				);
+			}
+		})
+		.catch((error: unknown) => botActionErrorCallback(error, bot, message));
+};
+
+export const setWaitlist = async (bot: TelegramBot, message: BotTextMessage, event: RSVPEvent) => {
+	const hasWaitList = message.text ? true : false;
+	await eventCollection()
+		.findOneAndUpdate(
+			{ _id: event._id },
+			{
+				$set: { hasWaitList }
 			},
 			{ upsert: true, returnDocument: 'after' }
 		)

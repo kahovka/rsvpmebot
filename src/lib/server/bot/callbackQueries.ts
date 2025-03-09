@@ -1,14 +1,15 @@
 import TelegramBot from 'npm:node-telegram-bot-api';
-import { RSVPEventParticipant, RSVPEvent } from '../db/types.ts';
+import { translate } from '../../i18n/translate.ts';
 import { eventCollection } from '../db/mongo.ts';
+import { RSVPEvent, RSVPEventParticipant } from '../db/types.ts';
+import { botMessageInlineKeyboardOptions, botMessageTextOptions } from './misc.ts';
+import { BotCallbackQuery, BotTextMessage } from './schemata.ts';
 import {
 	botActionErrorCallback,
 	getEventDescriptionHtml,
 	getParticipantDisplayName,
 	sendNewEventMessage
 } from './utils.ts';
-import { botMessageInlineKeyboardOptions, botMessageTextOptions } from './misc.ts';
-import { BotCallbackQuery, BotTextMessage } from './schemata.ts';
 
 const saveNewParticipantsAndNotify = async (
 	bot: TelegramBot,
@@ -23,7 +24,7 @@ const saveNewParticipantsAndNotify = async (
 			{
 				$set: {
 					participantsList: newParticipantsList,
-					waitlingList: newWaitingList
+					...(event?.hasWaitlist && { waitlingList: newWaitingList })
 				}
 			},
 			{ upsert: true, returnDocument: 'after' }
@@ -44,6 +45,45 @@ const saveNewParticipantsAndNotify = async (
 		});
 };
 
+async function registerNewParticipant(
+	bot: TelegramBot,
+	query: BotCallbackQuery,
+	event: RSVPEvent,
+	newParticipant: RSVPEventParticipant
+) {
+	const allParticipants = [...(event.participantsList ?? []), ...(event.waitlingList ?? [])];
+
+	if (
+		event.participantLimit &&
+		event.hasWaitlist !== true &&
+		allParticipants.length >= event.participantLimit
+	) {
+		await bot.sendMessage(
+			query.message.chat.id,
+			translate('event.messages.eventIsFull', event.lang)
+		);
+		return;
+	}
+
+	const newFullListOfParticipants = [...allParticipants, newParticipant];
+	const maxParticipants = event.participantLimit ?? 0; // typesafety only
+
+	const newParticipantsList = maxParticipants
+		? [...newFullListOfParticipants].splice(0, maxParticipants)
+		: newFullListOfParticipants;
+
+	const newWaitingList = maxParticipants
+		? [...newFullListOfParticipants].splice(maxParticipants)
+		: [];
+	await saveNewParticipantsAndNotify(
+		bot,
+		query.message,
+		event,
+		newParticipantsList,
+		newWaitingList
+	).catch((error) => botActionErrorCallback(error, bot, query.message));
+}
+
 export const registerParticipant = async (
 	bot: TelegramBot,
 	query: BotCallbackQuery,
@@ -62,24 +102,8 @@ export const registerParticipant = async (
 		// this participant is already there
 		return;
 	}
-	const newFullListOfParticipants = [...allParticipants, newParticipant];
-	const maxParticipants = event.participantLimit ?? 0; // typesafety only
 
-	const newParticipantsList = maxParticipants
-		? [...newFullListOfParticipants].splice(0, maxParticipants)
-		: newFullListOfParticipants;
-
-	const newWaitingList = maxParticipants
-		? [...newFullListOfParticipants].splice(maxParticipants)
-		: [];
-	query.message &&
-		(await saveNewParticipantsAndNotify(
-			bot,
-			query.message,
-			event,
-			newParticipantsList,
-			newWaitingList
-		).catch((error) => botActionErrorCallback(error, bot, query.message)));
+	await registerNewParticipant(bot, query, event, newParticipant);
 };
 
 export const registerParticipantPlusOne = async (
@@ -89,15 +113,13 @@ export const registerParticipantPlusOne = async (
 ) => {
 	const participantId = query.from.id;
 	const allParticipants = [...(event.participantsList ?? []), ...(event.waitlingList ?? [])];
-	// avoid duplicates
 	if (allParticipants.map(({ tgid }) => tgid).includes(participantId)) {
 		// this participant is already there and can add plus one
 	} else {
-		query.message &&
-			(await bot.sendMessage(
-				query.message.chat.id,
-				'You can only bring someone if you come yourself ;)'
-			));
+		await bot.sendMessage(
+			query.message.chat.id,
+			translate('event.messages.noPlusOnePossible', event.lang)
+		);
 		return;
 	}
 	const newParticipant = {
@@ -106,24 +128,8 @@ export const registerParticipantPlusOne = async (
 		username: query.from.username,
 		isPlusOne: true
 	};
-	const newFullListOfParticipants = [...allParticipants, newParticipant];
-	const maxParticipants = event.participantLimit ?? 0; // typesafety only
 
-	const newParticipantsList = maxParticipants
-		? [...newFullListOfParticipants].splice(0, maxParticipants)
-		: newFullListOfParticipants;
-
-	const newWaitingList = maxParticipants
-		? [...newFullListOfParticipants].splice(maxParticipants)
-		: [];
-	query.message &&
-		(await saveNewParticipantsAndNotify(
-			bot,
-			query.message,
-			event,
-			newParticipantsList,
-			newWaitingList
-		).catch((error) => botActionErrorCallback(error, bot, query.message)));
+	await registerNewParticipant(bot, query, event, newParticipant);
 };
 
 export const removeParticipant = async (
