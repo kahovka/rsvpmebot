@@ -4,7 +4,7 @@ const userSchema = z.object({
 	id: z.number(),
 	first_name: z.string(),
 	username: z.string().optional(),
-	language_code: z.string()
+	language_code: z.string().optional()
 });
 
 const chatSchema = z.object({

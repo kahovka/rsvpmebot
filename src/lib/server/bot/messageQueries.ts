@@ -13,7 +13,7 @@ import { BotTextMessage } from './schemata.ts';
 export const createNewEvent = async (bot: TelegramBot, message: BotTextMessage) => {
 	await bot.deleteMessage(message.chat.id, message.message_id);
 	await bot
-		.sendMessage(message.chat.id, newEventState.messageToSend(message.from.language_code), {
+		.sendMessage(message.chat.id, newEventState.messageToSend(message.from.language_code ?? 'en'), {
 			reply_markup: botMessageTextOptions
 		})
 		.then((replyMessage: TelegramBot.Message) => {
@@ -22,7 +22,7 @@ export const createNewEvent = async (bot: TelegramBot, message: BotTextMessage) 
 				ownerId: message.from.id,
 				lastMessageId: replyMessage.message_id,
 				state: newEventState.nextState,
-				lang: message.from.language_code
+				lang: message.from.language_code ?? 'en'
 			});
 		})
 		.catch((error: unknown) => botActionErrorCallback(error, bot, message));
