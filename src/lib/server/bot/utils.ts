@@ -18,10 +18,10 @@ export const getParticipantDisplayName = (participant: RSVPEventParticipant) =>
 
 export const getEventDescriptionHtml = (event: RSVPEvent) => {
 	const allParticipants = event.participantsList
-		?.map((participant, ind) => `${ind}. ${getParticipantDisplayName(participant)}`)
+		?.map((participant, ind) => `${ind + 1}. ${getParticipantDisplayName(participant)}`)
 		?.join('\n');
 	const allWaiting = event.waitlingList
-		?.map((participant, ind) => `${ind}. ${getParticipantDisplayName(participant)}`)
+		?.map((participant, ind) => `${ind + 1}. ${getParticipantDisplayName(participant)}`)
 		?.join('\n');
 	return `
 		<b>${event.name ?? 'Your event'}</b>
