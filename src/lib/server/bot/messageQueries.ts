@@ -27,7 +27,7 @@ export const createNewEvent = async (bot: TelegramBot, message: BotTextMessage) 
 			reply_markup: botMessageTextOptions
 		})
 		.then((replyMessage: TelegramBot.Message) => {
-			eventCollection().insertOne({
+			return eventCollection().insertOne({
 				chatId: message.chat.id,
 				ownerId: message.from.id,
 				lastMessageId: replyMessage.message_id,
@@ -130,6 +130,11 @@ export const setWaitlist = async (bot: TelegramBot, message: BotTextMessage, eve
 				botMessageInlineKeyboardOptions(updatedEvent.lang, event.allowsPlusOne)
 			);
 			await setEventState(event, RSVPEventState.Polling);
+			// post link to ui to the chat
+			const eventLink = `https://rsvpmebot-42.deno.dev/${updatedEvent.ownerId}/${updatedEvent.chatId}/${updatedEvent._id}`;
+			await bot.sendMessage(message.chat.id, `Link to scrappy ui: [URL](${eventLink})`, {
+				parse_mode: 'markdown'
+			});
 		})
 		.catch((error: unknown) => botActionErrorCallback(error, bot, message));
 };
