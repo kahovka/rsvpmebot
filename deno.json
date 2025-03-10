@@ -7,7 +7,8 @@
 		"mongodb": "npm:mongodb",
 		"dotenv": "npm:dotenv",
 		"fs": "node:fs",
-		"@faker-js/faker": "npm:@faker-js/faker"
+		"@faker-js/faker": "npm:@faker-js/faker",
+		"zod": "npm:zod"
 	},
 	"compilerOptions": {
 		"checkJs": true,

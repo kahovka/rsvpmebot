@@ -1,4 +1,4 @@
-import { RSVPEvent, RSVPEventParticipant } from '../server/db/types.ts';
+import type { RSVPEvent, RSVPEventParticipant } from '../server/db/types.ts';
 
 export interface DisplayEvent {
 	id: string;
@@ -6,7 +6,7 @@ export interface DisplayEvent {
 	description: string;
 	numParticipants: number;
 	participants: DisplayEventParticipant[];
-	watingParticipants: DisplayEventParticipant[];
+	waitingParticipants: DisplayEventParticipant[];
 }
 
 export interface DisplayEventParticipant {
@@ -14,17 +14,18 @@ export interface DisplayEventParticipant {
 	name: string;
 }
 
-export const toDisplayEvent = (event: RSVPEvent): DisplayEvent | undefined =>
-	event._id && {
-		id: event._id.toString(),
+export const toDisplayEvent = (event: RSVPEvent): DisplayEvent => {
+	return {
+		id: event._id!.toString(),
 		name: event.name ?? 'Your event',
 		description: event.description ?? 'Your event details',
 		numParticipants: event.participantLimit ?? 0,
 		participants:
 			event.participantsList?.map((participant) => toDisplayParticipant(participant)) ?? [],
-		watingParticipants:
+		waitingParticipants:
 			event.waitlingList?.map((participant) => toDisplayParticipant(participant)) ?? []
 	};
+};
 
 export const toDisplayParticipant = (
 	participant: RSVPEventParticipant

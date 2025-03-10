@@ -3419,7 +3419,8 @@
       "npm:@logtape/logtape@~0.8.2",
       "npm:dotenv@*",
       "npm:mongodb@*",
-      "npm:node-telegram-bot-api@*"
+      "npm:node-telegram-bot-api@*",
+      "npm:zod@*"
     ],
     "packageJson": {
       "dependencies": [

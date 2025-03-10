@@ -17,10 +17,12 @@ export const fakeCompletedRSVPEvent = (numParticipants: number = 4): RSVPEvent =
 	lastMessageId: faker.number.int(),
 	state: RSVPEventState.Polling,
 	name: faker.word.words(2),
+	hasWaitlist: true,
+	allowsPlusOne: true,
 	description: faker.word.words(15),
 	participantLimit: numParticipants,
 	participantsList: new Array(numParticipants).fill(0).map(() => fakeParticipant()),
-	waitlingList: new Array(2).fill(0).map(() => fakeParticipant())
+	waitlingList: new Array(numParticipants).fill(0).map(() => fakeParticipant())
 });
 
 export const fakeStaticCompletedEvent = {

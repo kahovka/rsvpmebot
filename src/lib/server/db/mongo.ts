@@ -1,7 +1,7 @@
 import { MongoClient, type ObjectId } from 'npm:mongodb';
 import { env } from '$env/dynamic/private';
 import { logger } from '../../../logger.ts';
-import { RSVPEvent, RSVPEventState } from './types.ts';
+import { type RSVPEvent, RSVPEventState } from './types.ts';
 import { getEventNextState } from '../bot/utils.ts';
 
 const client = new MongoClient(env.MONGO_DB_URL ?? 'mongodb://127.0.0.1:27017');
@@ -51,6 +51,10 @@ export const setEventState = async (event: RSVPEvent, nextState: RSVPEventState 
 		{ upsert: true }
 	);
 };
+export const getEventById = async (eventId: ObjectId) =>
+	await eventCollection().findOne({
+		_id: eventId
+	});
 
 export const getEvent = async (chatId: number, lastBotMessageId: number) =>
 	await eventCollection().findOne({

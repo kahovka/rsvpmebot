@@ -10,6 +10,7 @@ import {
 	getParticipantDisplayName,
 	sendNewEventMessage
 } from './utils.ts';
+import { logger } from '../../../logger.ts';
 
 const saveNewParticipantsAndNotify = async (
 	bot: TelegramBot,
@@ -22,8 +23,16 @@ const saveNewParticipantsAndNotify = async (
 		participantsList: newParticipantsList,
 		...(event?.hasWaitlist && { waitlingList: newWaitingList })
 	}).then(async (updatedEvent) => {
-		// delete previous announcement
-		await bot.deleteMessage(message.chat.id, event.lastMessageId);
+		// try delete previous announcement, sometimes fails
+		try {
+			await bot.deleteMessage(message.chat.id, event.lastMessageId);
+		} catch (error) {
+			logger.debug('Could not delete last message: {eventId} {messageId} ', {
+				eventId: event._id,
+				messageId: message.chat.id
+			});
+		}
+
 		await sendNewEventMessage(
 			bot,
 			message.chat.id,
@@ -160,8 +169,8 @@ export const removeParticipant = async (
 		: newFullListOfParticipants;
 
 	const newWaitingList = maxParticipants
-		? []
-		: [...newFullListOfParticipants].splice(maxParticipants);
+		? [...newFullListOfParticipants].splice(maxParticipants)
+		: [];
 	await saveNewParticipantsAndNotify(bot, query.message, event, newParticipantsList, newWaitingList)
 		.then(async () => {
 			const newParticipantsOntheBlock = newParticipantsList.filter(
@@ -170,10 +179,7 @@ export const removeParticipant = async (
 			if (newParticipantsOntheBlock.length > 0) {
 				await bot.sendMessage(
 					query.message.chat.id,
-					`Hello ${getParticipantDisplayName(newParticipantsOntheBlock[0])}, there is a spot for you now!`,
-					{
-						reply_markup: botMessageTextOptions
-					}
+					`Hello ${getParticipantDisplayName(newParticipantsOntheBlock[0])}, there is a spot for you now!`
 				);
 			}
 		})
