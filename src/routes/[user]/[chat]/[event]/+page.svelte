@@ -23,12 +23,12 @@
 			<p class="my-2 font-serif text-lg text-black">participants:</p>
 			<div class="mx-2">
 				{#each event.participants as participant, index}
-					<form class="m-1 flex max-w-72" method="POST">
+					<form class="m-1 flex max-w-72" method="POST" action="?/deleteParticipant">
 						<input type="hidden" name="participantId" value={participant.id} />
 						<input type="hidden" name="eventId" value={event.id} />
 						<p class="min-w-68">{index + 1}. {participant.name}</p>
 						<Button
-							formaction="?/deleteParticipant"
+							type="submit"
 							class="justify-self-end"
 							outline
 							color="red"
