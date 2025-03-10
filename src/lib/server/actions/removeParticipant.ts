@@ -1,5 +1,5 @@
-import { ObjectId } from 'mongodb';
-import { z } from 'zod';
+import { ObjectId } from 'npm:mongodb';
+import { z } from 'npm:zod';
 import { getEventById } from '../db/mongo';
 import type { BotCallbackQuery } from '../bot/schemata';
 import { removeParticipant } from '../bot/callbackQueries';
