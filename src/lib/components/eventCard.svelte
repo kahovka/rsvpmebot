@@ -19,11 +19,16 @@
 					<p><b>Max paritipants:</b> {event.numParticipants}</p>
 				{/if}
 				<p><b>Current participants:</b> {event.participants.length}</p>
-				{#if event.watingParticipants.length > 0}
+				{#if event.watingParticipants?.length > 0}
 					<p><b>Current waitlist:</b> {event.watingParticipants.length}</p>
 				{/if}
 			</div>
-			<Button class="max-w-8" size="sm" color="blue">Go</Button>
+			<Button
+				class="max-w-8"
+				size="sm"
+				color="blue"
+				href="/{event.ownerId}/{event.chatId}/{event.id}">Go</Button
+			>
 		</div>
 	</Card>
 </div>

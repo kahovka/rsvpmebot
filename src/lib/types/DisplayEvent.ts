@@ -3,6 +3,8 @@ import type { RSVPEvent, RSVPEventParticipant } from '../server/db/types.ts';
 export interface DisplayEvent {
 	id: string;
 	name: string;
+	ownerId: number | undefined;
+	chatId: number | undefined;
 	description: string;
 	numParticipants: number;
 	participants: DisplayEventParticipant[];
@@ -18,6 +20,8 @@ export const toDisplayEvent = (event: RSVPEvent): DisplayEvent => {
 	return {
 		id: event._id!.toString(),
 		name: event.name ?? 'Your event',
+		ownerId: event.ownerId,
+		chatId: event.chatId,
 		description: event.description ?? 'Your event details',
 		numParticipants: event.participantLimit ?? 0,
 		participants:
