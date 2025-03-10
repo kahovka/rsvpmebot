@@ -2,8 +2,8 @@ import TelegramBot from 'npm:node-telegram-bot-api';
 import { match } from 'npm:ts-pattern';
 import { logger } from '../../../logger.ts';
 import { translate } from '../../i18n/translate.ts';
-import { eventCollection } from '../db/mongo.ts';
-import { RSVPEvent, RSVPEventParticipant, RSVPEventState } from '../db/types.ts';
+import { updateEventById } from '../db/mongo.ts';
+import { type RSVPEvent, type RSVPEventParticipant, RSVPEventState } from '../db/types.ts';
 import {
 	setDescriptionState,
 	setNameState,
@@ -11,7 +11,7 @@ import {
 	setPlusOneState,
 	setWaitlist
 } from './botStates.ts';
-import { BotTextMessage } from './schemata.ts';
+import type { BotTextMessage } from './schemata.ts';
 
 export const getParticipantDisplayName = (participant: RSVPEventParticipant) =>
 	`${participant.firstName}${participant.username ? ' (' + participant.username + ')' : ''}`;
@@ -55,18 +55,6 @@ export const botActionErrorCallback = (
 	);
 };
 
-export const setEventState = async (event: RSVPEvent, nextState: RSVPEventState | undefined) => {
-	await eventCollection().updateOne(
-		{ _id: event._id },
-		{
-			$set: {
-				state: nextState ?? getEventNextState(event)
-			}
-		},
-		{ upsert: true }
-	);
-};
-
 export const deleteExistingMessagesAndReply = async (
 	bot: TelegramBot,
 	message: BotTextMessage,
@@ -93,14 +81,6 @@ export const sendNewEventMessage = async (
 			parse_mode: 'HTML'
 		})
 		.then((replyMessage: TelegramBot.Message) => {
-			eventCollection().updateOne(
-				{ _id: event._id },
-				{
-					$set: {
-						lastMessageId: replyMessage.message_id
-					}
-				},
-				{ upsert: true }
-			);
+			updateEventById(event._id, { lastMessageId: replyMessage.message_id });
 		});
 };

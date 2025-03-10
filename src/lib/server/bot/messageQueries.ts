@@ -1,6 +1,6 @@
 import TelegramBot from 'npm:node-telegram-bot-api';
-import { eventCollection } from '../db/mongo.ts';
-import { RSVPEvent, RSVPEventState } from '../db/types.ts';
+import { eventCollection, setEventState, updateEventById } from '../db/mongo.ts';
+import { type RSVPEvent, RSVPEventState } from '../db/types.ts';
 import {
 	newEventState,
 	setDescriptionState,
@@ -13,13 +13,12 @@ import {
 	botMessageTextOptions,
 	ynKeyboardOptions
 } from './misc.ts';
+import type { BotTextMessage } from './schemata.ts';
 import {
 	botActionErrorCallback,
 	deleteExistingMessagesAndReply,
-	getEventDescriptionHtml,
-	setEventState
+	getEventDescriptionHtml
 } from './utils.ts';
-import { BotTextMessage } from './schemata.ts';
 
 export const createNewEvent = async (bot: TelegramBot, message: BotTextMessage) => {
 	await bot.deleteMessage(message.chat.id, message.message_id);
@@ -40,20 +39,8 @@ export const createNewEvent = async (bot: TelegramBot, message: BotTextMessage) 
 };
 
 export const setEventName = async (bot: TelegramBot, message: BotTextMessage, event: RSVPEvent) => {
-	await eventCollection()
-		.findOneAndUpdate(
-			{ _id: event._id },
-			{
-				$set: {
-					name: message.text
-				}
-			},
-			{ upsert: true, returnDocument: 'after' }
-		)
-		.then(async (updatedEvent) => {
-			if (!updatedEvent) {
-				throw `No event found to update, ${event._id}, ${JSON.stringify(message)}`;
-			}
+	await updateEventById(event._id, { name: message.text })
+		.then(async (updatedEvent: RSVPEvent) => {
 			await deleteExistingMessagesAndReply(
 				bot,
 				message,
@@ -71,20 +58,8 @@ export const setEventDescription = async (
 	message: BotTextMessage,
 	event: RSVPEvent
 ) => {
-	await eventCollection()
-		.findOneAndUpdate(
-			{ _id: event._id },
-			{
-				$set: {
-					description: message.text
-				}
-			},
-			{ upsert: true, returnDocument: 'after' }
-		)
-		.then(async (updatedEvent) => {
-			if (!updatedEvent) {
-				throw `No event found to update, ${event._id}, ${JSON.stringify(message)}`;
-			}
+	await updateEventById(event._id, { description: message.text })
+		.then(async (updatedEvent: RSVPEvent) => {
 			await deleteExistingMessagesAndReply(
 				bot,
 				message,
@@ -103,20 +78,8 @@ export const setPlusOneOption = async (
 	event: RSVPEvent
 ) => {
 	const allowsPlusOne = message.text.includes('✅') ? true : false;
-	await eventCollection()
-		.findOneAndUpdate(
-			{ _id: event._id },
-			{
-				$set: {
-					allowsPlusOne
-				}
-			},
-			{ upsert: true, returnDocument: 'after' }
-		)
-		.then(async (updatedEvent) => {
-			if (!updatedEvent) {
-				throw `No event found to update, ${event._id}, ${JSON.stringify(message)}`;
-			}
+	await updateEventById(event._id, { allowsPlusOne })
+		.then(async (updatedEvent: RSVPEvent) => {
 			await deleteExistingMessagesAndReply(
 				bot,
 				message,
@@ -135,25 +98,12 @@ export const setParticipantLimit = async (
 	event: RSVPEvent
 ) => {
 	const participantLimit = Number(message.text) || 0;
-	await eventCollection()
-		.findOneAndUpdate(
-			{ _id: event._id },
-			{
-				$set: {
-					participantLimit
-				}
-			},
-			{ upsert: true, returnDocument: 'after' }
-		)
+	await updateEventById(event._id, { participantLimit })
 		.then(async (updatedEvent) => {
-			if (!updatedEvent) {
-				throw `No event found to update, ${event._id}, ${JSON.stringify(message)}`;
-			}
-
 			if (participantLimit === 0) {
 				await setEventState(event, RSVPEventState.ParticipantLimitSet);
 				// do not sent message, we know waitlist is not needed
-				await setWaitlist(bot, { ...message, text: '' }, updatedEvent); // who needs a waiting list if you have unlimited participants?
+				await setWaitlist(bot, { ...message, text: 'no waitlist needed' }, updatedEvent);
 			} else {
 				await deleteExistingMessagesAndReply(
 					bot,
@@ -170,18 +120,8 @@ export const setParticipantLimit = async (
 
 export const setWaitlist = async (bot: TelegramBot, message: BotTextMessage, event: RSVPEvent) => {
 	const hasWaitlist = message.text.includes('✅') ? true : false;
-	await eventCollection()
-		.findOneAndUpdate(
-			{ _id: event._id },
-			{
-				$set: { hasWaitlist }
-			},
-			{ upsert: true, returnDocument: 'after' }
-		)
+	await updateEventById(event._id, { hasWaitlist })
 		.then(async (updatedEvent) => {
-			if (!updatedEvent) {
-				throw `No event found to update, ${event._id}, ${JSON.stringify(message)}`;
-			}
 			await deleteExistingMessagesAndReply(
 				bot,
 				message,
