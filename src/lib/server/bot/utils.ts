@@ -14,7 +14,7 @@ import {
 import type { BotTextMessage } from './schemata.ts';
 
 export const getParticipantDisplayName = (participant: RSVPEventParticipant) =>
-	`${participant.firstName}${participant.username ? ' (' + participant.username + ')' : ''}`;
+	`${participant.firstName}${participant.username ? ' (@' + participant.username + ')' : ''}`;
 
 export const getEventDescriptionHtml = (event: RSVPEvent) => {
 	const allParticipants = event.participantsList
