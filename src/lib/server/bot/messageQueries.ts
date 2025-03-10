@@ -169,12 +169,12 @@ export const setParticipantLimit = async (
 };
 
 export const setWaitlist = async (bot: TelegramBot, message: BotTextMessage, event: RSVPEvent) => {
-	const hasWaitList = message.text.includes('✅') ? true : false;
+	const hasWaitlist = message.text.includes('✅') ? true : false;
 	await eventCollection()
 		.findOneAndUpdate(
 			{ _id: event._id },
 			{
-				$set: { hasWaitList }
+				$set: { hasWaitlist }
 			},
 			{ upsert: true, returnDocument: 'after' }
 		)
