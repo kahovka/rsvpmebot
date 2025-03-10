@@ -132,9 +132,13 @@ export const setWaitlist = async (bot: TelegramBot, message: BotTextMessage, eve
 			await setEventState(event, RSVPEventState.Polling);
 			// post link to ui to the chat
 			const eventLink = `https://rsvpmebot-42.deno.dev/${updatedEvent.ownerId}/${updatedEvent.chatId}/${updatedEvent._id}`;
-			await bot.sendMessage(message.chat.id, `Link to scrappy ui: [URL](${eventLink})`, {
-				parse_mode: 'markdown'
-			});
+			await bot.sendMessage(
+				message.chat.id,
+				`Link to scrappy ui : [Manage ${updatedEvent.name}](${eventLink})`,
+				{
+					parse_mode: 'markdown'
+				}
+			);
 		})
 		.catch((error: unknown) => botActionErrorCallback(error, bot, message));
 };
