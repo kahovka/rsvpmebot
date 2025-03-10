@@ -1,4 +1,4 @@
-import TelegramBot from 'npm:node-telegram-bot-api';
+import TelegramBot from 'node-telegram-bot-api';
 import { translate } from '../../i18n/translate.ts';
 import { updateEventById } from '../db/mongo.ts';
 import type { RSVPEvent, RSVPEventParticipant } from '../db/types.ts';
@@ -111,12 +111,14 @@ export const registerParticipantPlusOne = async (
 ) => {
 	const participantId = query.from.id;
 	const allParticipants = [...(event.participantsList ?? []), ...(event.waitlingList ?? [])];
-	if (allParticipants.map(({ tgid }) => tgid).includes(participantId)) {
+	if (!allParticipants.map(({ tgid }) => tgid).includes(participantId)) {
 		// this participant is already there and can add plus one
-	} else {
+		const existingParticipant = allParticipants.find(
+			(participant) => participant.tgid === participantId
+		);
 		await bot.sendMessage(
 			query.message.chat.id,
-			translate('event.messages.noPlusOnePossible', event.lang)
+			`${translate('event.messages.noPlusOnePossible', event.lang)} ${existingParticipant && getParticipantDisplayName(existingParticipant)}`
 		);
 		return;
 	}
@@ -176,6 +178,7 @@ export const removeParticipant = async (
 			const newParticipantsOntheBlock = newParticipantsList.filter(
 				(participant) => !event.participantsList?.map(({ tgid }) => tgid).includes(participant.tgid)
 			);
+
 			if (newParticipantsOntheBlock.length > 0) {
 				await bot.sendMessage(
 					query.message.chat.id,
