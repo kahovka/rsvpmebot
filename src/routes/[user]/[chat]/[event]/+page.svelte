@@ -1,5 +1,7 @@
 <script>
 	import { Card } from 'flowbite-svelte';
+	import { Button } from 'flowbite-svelte';
+	import { TrashBinOutline } from 'flowbite-svelte-icons';
 
 	let { data } = $props();
 	let { event } = data;
@@ -7,29 +9,42 @@
 
 <div class="centered">
 	<Card class="h-full min-h-40">
-		<p>
-			{event?.name}
-		</p>
-		<p>
+		<h2 class="my-4 font-serif text-xl text-black">{event?.name}</h2>
+
+		<p class="my-2">
+			<span class="font-serif text-lg text-black">about:</span>
 			{event?.description}
 		</p>
-		<p>Num Participants: {event?.numParticipants}</p>
+		<p>
+			<span class="font-serif text-lg text-black">participants limit:</span>
+			{event?.numParticipants}
+		</p>
 		{#if event.participants.length > 0}
-			<p>Participants:</p>
-			{#each event.participants as participant}
-				<form method="POST" action="?/deleteParticipant">
-					<input type="hidden" name="participantId" value={participant.id} />
-					<input type="hidden" name="eventId" value={event.id} />
-					<p>{participant.name}</p>
-					<button aria-label="delete-participant">x</button>
-				</form>
-			{/each}
+			<p class="my-2 font-serif text-lg text-black">participants:</p>
+			<div class="mx-2">
+				{#each event.participants as participant, index}
+					<form class="m-1 flex max-w-72" method="POST" action="?/deleteParticipant">
+						<input type="hidden" name="participantId" value={participant.id} />
+						<input type="hidden" name="eventId" value={event.id} />
+						<p class="min-w-68">{index + 1}. {participant.name}</p>
+						<Button
+							class="justify-self-end"
+							outline
+							color="red"
+							size="xs"
+							aria-label="delete-participant"><TrashBinOutline class="h-3 w-3" /></Button
+						>
+					</form>
+				{/each}
+			</div>
 		{/if}
 		{#if event.waitingParticipants.length > 0}
-			<p>Waiting list:</p>
-			{#each event.waitingParticipants as participant}
-				<p>{participant.name}</p>
+			<p class="font-serif text-lg text-black">waiting list:</p>
+			{#each event.waitingParticipants as participant, index}
+				<p class="m-1 min-w-68">{index + 1}. {participant.name}</p>
 			{/each}
 		{/if}
 	</Card>
+
+	<Button class="my-4" outline href="/{event.ownerId}">Take me to my events</Button>
 </div>
