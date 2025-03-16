@@ -26,7 +26,7 @@ bot.onText(/.*/, (message: TelegramBot.Message) => {
 	logger.debug('Received something: {message}', { message });
 });
 
-bot.onText('\/event', async (raw_message: TelegramBot.Message) => {
+bot.onText(/^\/event.*/, async (raw_message: TelegramBot.Message) => {
 	try {
 		const message = BotTextMessageSchema.parse(raw_message);
 		await createNewEvent(bot, message);
