@@ -30,7 +30,7 @@ export const createNewEvent = async (bot: TelegramBot, message: BotTextMessage) 
 
 	await bot
 		.sendMessage(message.chat.id, newEventState.messageToSend(message.from.language_code ?? 'en'), {
-			reply_markup: botMessageTextOptions(message.reply_to_message.message_id)
+			reply_markup: botMessageTextOptions(message.reply_to_message?.message_id)
 		})
 		.then((replyMessage: TelegramBot.Message) => {
 			return eventCollection().insertOne({
@@ -52,7 +52,7 @@ export const setEventName = async (bot: TelegramBot, message: BotTextMessage, ev
 				message,
 				updatedEvent,
 				setNameState.messageToSend(updatedEvent.lang),
-				botMessageTextOptions(message.reply_to_message.message_id)
+				botMessageTextOptions(message.reply_to_message?.message_id)
 			);
 			await setEventState(event, RSVPEventState.NameSet);
 		})
@@ -71,7 +71,7 @@ export const setEventDescription = async (
 				message,
 				updatedEvent,
 				setDescriptionState.messageToSend(updatedEvent.lang),
-				ynKeyboardOptions(message.reply_to_message.message_id)
+				ynKeyboardOptions(message.reply_to_message?.message_id)
 			);
 			await setEventState(event, RSVPEventState.DescriptionSet);
 		})
@@ -91,7 +91,7 @@ export const setPlusOneOption = async (
 				message,
 				updatedEvent,
 				setPlusOneState.messageToSend(updatedEvent.lang),
-				botMessageTextOptions(message.reply_to_message.message_id)
+				botMessageTextOptions(message.reply_to_message?.message_id)
 			);
 			await setEventState(event, RSVPEventState.PlusOneSet);
 		})
@@ -116,7 +116,7 @@ export const setParticipantLimit = async (
 					message,
 					updatedEvent,
 					setParticipantLimitState.messageToSend(updatedEvent.lang),
-					ynKeyboardOptions(message.reply_to_message.message_id)
+					ynKeyboardOptions(message.reply_to_message?.message_id)
 				);
 				await setEventState(event, RSVPEventState.ParticipantLimitSet);
 			}
@@ -134,7 +134,7 @@ export const setWaitlist = async (bot: TelegramBot, message: BotTextMessage, eve
 				updatedEvent,
 				getEventDescriptionHtml(updatedEvent),
 				botMessageInlineKeyboardOptions(
-					message.reply_to_message.message_id,
+					message.reply_to_message?.message_id,
 					updatedEvent.lang,
 					event.allowsPlusOne
 				)

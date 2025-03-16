@@ -1,14 +1,14 @@
 import { translate } from '../../i18n/translate.ts';
 
-export const botMessageTextOptions = (originalMessageId: number) =>
+export const botMessageTextOptions = (originalMessageId: number | undefined) =>
 	JSON.stringify({
-		reply_to_message_id: originalMessageId,
+		...(originalMessageId && { reply_to_message_id: originalMessageId }),
 		force_reply: true
 	});
 
-export const ynKeyboardOptions = (originalMessageId: number) =>
+export const ynKeyboardOptions = (originalMessageId: number | undefined) =>
 	JSON.stringify({
-		reply_to_message_id: originalMessageId,
+		...(originalMessageId && { reply_to_message_id: originalMessageId }),
 		one_time_keyboard: true,
 		input_field_placeholder: '✅',
 		keyboard: [['✅', '❌']],
@@ -17,7 +17,7 @@ export const ynKeyboardOptions = (originalMessageId: number) =>
 	});
 
 export const botMessageInlineKeyboardOptions = (
-	originalMessageId: number,
+	originalMessageId: number | undefined,
 	lang: string,
 	allowsPlusOne: boolean = false
 ) => {
@@ -33,7 +33,7 @@ export const botMessageInlineKeyboardOptions = (
 			];
 
 	return JSON.stringify({
-		reply_to_message_id: originalMessageId,
+		...(originalMessageId && { reply_to_message_id: originalMessageId }),
 		inline_keyboard: [inlineButtons],
 		force_reply: true
 	});

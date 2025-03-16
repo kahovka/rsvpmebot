@@ -40,7 +40,7 @@ bot.on('message', async (raw_message: TelegramBot.Message) => {
 		const message = BotTextMessageSchema.parse(raw_message);
 		const existingEvent =
 			message.reply_to_message &&
-			(await getEvent(message.chat.id, message.reply_to_message.message_id));
+			(await getEvent(message.chat.id, message.reply_to_message?.message_id));
 
 		if (!existingEvent) {
 			logger.debug('Could not find event or parse message: {message}', {

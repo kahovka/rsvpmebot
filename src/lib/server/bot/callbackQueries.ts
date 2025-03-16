@@ -39,7 +39,7 @@ const saveNewParticipantsAndNotify = async (
 			updatedEvent,
 			getEventDescriptionHtml(updatedEvent),
 			botMessageInlineKeyboardOptions(
-				message.reply_to_message.message_id,
+				message.reply_to_message?.message_id,
 				updatedEvent.lang,
 				event.allowsPlusOne
 			)
