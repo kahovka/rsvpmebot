@@ -72,18 +72,19 @@ export const deleteExistingMessagesAndReply = async (
 		});
 	}
 
-	await sendNewEventMessage(bot, message.chat.id, event, messageToSend, replyMarkup);
+	await sendNewEventMessage(bot, message, event, messageToSend, replyMarkup);
 };
 
 export const sendNewEventMessage = async (
 	bot: TelegramBot,
-	chatId: number,
+	message: BotTextMessage,
 	event: RSVPEvent,
 	messageToSend: string,
 	replyMarkup: string
 ) => {
 	await bot
-		.sendMessage(chatId, messageToSend, {
+		.sendMessage(message.chat.id, messageToSend, {
+			...(message.message_thread_id && { message_thread_id: message.message_thread_id }),
 			...(replyMarkup && { reply_markup: replyMarkup }),
 			parse_mode: 'HTML'
 		})

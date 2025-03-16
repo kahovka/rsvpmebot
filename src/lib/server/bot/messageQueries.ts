@@ -24,7 +24,8 @@ import { logger } from '../../../logger.ts';
 export const createNewEvent = async (bot: TelegramBot, message: BotTextMessage) => {
 	await bot
 		.sendMessage(message.chat.id, newEventState.messageToSend(message.from.language_code ?? 'en'), {
-			reply_markup: botMessageTextOptions(message.message_thread_id)
+			reply_markup: botMessageTextOptions,
+			...(message.message_thread_id && { message_thread_id: message.message_thread_id })
 		})
 		.then((replyMessage: TelegramBot.Message) => {
 			return eventCollection().insertOne({
@@ -52,7 +53,7 @@ export const setEventName = async (bot: TelegramBot, message: BotTextMessage, ev
 				message,
 				updatedEvent,
 				setNameState.messageToSend(updatedEvent.lang),
-				botMessageTextOptions(message.reply_to_message?.message_id)
+				botMessageTextOptions
 			);
 			await setEventState(event, RSVPEventState.NameSet);
 		})
@@ -91,7 +92,7 @@ export const setPlusOneOption = async (
 				message,
 				updatedEvent,
 				setPlusOneState.messageToSend(updatedEvent.lang),
-				botMessageTextOptions(message.reply_to_message?.message_id)
+				botMessageTextOptions
 			);
 			await setEventState(event, RSVPEventState.PlusOneSet);
 		})
