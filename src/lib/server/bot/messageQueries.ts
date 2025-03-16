@@ -19,9 +19,15 @@ import {
 	deleteExistingMessagesAndReply,
 	getEventDescriptionHtml
 } from './utils.ts';
+import { logger } from '../../../logger.ts';
 
 export const createNewEvent = async (bot: TelegramBot, message: BotTextMessage) => {
-	await bot.deleteMessage(message.chat.id, message.message_id);
+	try {
+		await bot.deleteMessage(message.chat.id, message.message_id);
+	} catch (error) {
+		logger.error('Error while deleting own start command message, {error}', { error });
+	}
+
 	await bot
 		.sendMessage(message.chat.id, newEventState.messageToSend(message.from.language_code ?? 'en'), {
 			reply_markup: botMessageTextOptions

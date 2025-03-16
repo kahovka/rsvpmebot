@@ -62,8 +62,15 @@ export const deleteExistingMessagesAndReply = async (
 	messageToSend: string,
 	replyMarkup: string
 ) => {
-	await bot.deleteMessage(message.chat.id, event.lastMessageId);
-	await bot.deleteMessage(message.chat.id, message.message_id);
+	try {
+		await bot.deleteMessage(message.chat.id, event.lastMessageId);
+		await bot.deleteMessage(message.chat.id, message.message_id);
+	} catch (error) {
+		logger.debug('Could not delete last messages: {eventId} {messageId} ', {
+			eventId: event._id,
+			messageId: message.chat.id
+		});
+	}
 
 	await sendNewEventMessage(bot, message.chat.id, event, messageToSend, replyMarkup);
 };
