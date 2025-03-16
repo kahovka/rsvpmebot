@@ -18,6 +18,7 @@ export const BotTextMessageSchema = z.object({
 		})
 		.optional(),
 	message_id: z.number(),
+	message_thread_id: z.number().optional(),
 	from: userSchema,
 	chat: chatSchema,
 	text: z.string()

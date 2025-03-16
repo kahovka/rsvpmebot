@@ -1,8 +1,8 @@
 import { translate } from '../../i18n/translate.ts';
 
-export const botMessageTextOptions = (originalMessageId: number | undefined) =>
+export const botMessageTextOptions = (originalThreadId: number | undefined) =>
 	JSON.stringify({
-		...(originalMessageId && { reply_to_message_id: originalMessageId }),
+		...(originalThreadId && { message_thread_id: originalThreadId }),
 		force_reply: true
 	});
 

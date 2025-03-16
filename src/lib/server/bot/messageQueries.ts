@@ -24,7 +24,7 @@ import { logger } from '../../../logger.ts';
 export const createNewEvent = async (bot: TelegramBot, message: BotTextMessage) => {
 	await bot
 		.sendMessage(message.chat.id, newEventState.messageToSend(message.from.language_code ?? 'en'), {
-			reply_markup: botMessageTextOptions(message.message_id)
+			reply_markup: botMessageTextOptions(message.message_thread_id)
 		})
 		.then((replyMessage: TelegramBot.Message) => {
 			return eventCollection().insertOne({
