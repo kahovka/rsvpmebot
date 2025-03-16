@@ -22,15 +22,9 @@ import {
 import { logger } from '../../../logger.ts';
 
 export const createNewEvent = async (bot: TelegramBot, message: BotTextMessage) => {
-	try {
-		await bot.deleteMessage(message.chat.id, message.message_id);
-	} catch (error) {
-		logger.error('Error while deleting own start command message, {error}', { error });
-	}
-
 	await bot
 		.sendMessage(message.chat.id, newEventState.messageToSend(message.from.language_code ?? 'en'), {
-			reply_markup: botMessageTextOptions(message.reply_to_message?.message_id)
+			reply_markup: botMessageTextOptions(message.message_id)
 		})
 		.then((replyMessage: TelegramBot.Message) => {
 			return eventCollection().insertOne({
@@ -42,6 +36,12 @@ export const createNewEvent = async (bot: TelegramBot, message: BotTextMessage) 
 			});
 		})
 		.catch((error: unknown) => botActionErrorCallback(error, bot, message));
+
+	try {
+		await bot.deleteMessage(message.chat.id, message.message_id);
+	} catch (error) {
+		logger.error('Error while deleting own start command message, {error}', { error });
+	}
 };
 
 export const setEventName = async (bot: TelegramBot, message: BotTextMessage, event: RSVPEvent) => {
