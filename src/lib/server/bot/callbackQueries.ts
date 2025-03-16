@@ -1,8 +1,9 @@
 import TelegramBot from 'npm:node-telegram-bot-api';
+import { logger } from '../../../logger.ts';
 import { translate } from '../../i18n/translate.ts';
 import { updateEventById } from '../db/mongo.ts';
 import type { RSVPEvent, RSVPEventParticipant } from '../db/types.ts';
-import { botMessageInlineKeyboardOptions, botMessageTextOptions } from './misc.ts';
+import { botMessageInlineKeyboardOptions } from './misc.ts';
 import type { BotCallbackQuery, BotTextMessage } from './schemata.ts';
 import {
 	botActionErrorCallback,
@@ -10,7 +11,6 @@ import {
 	getParticipantDisplayName,
 	sendNewEventMessage
 } from './utils.ts';
-import { logger } from '../../../logger.ts';
 
 const saveNewParticipantsAndNotify = async (
 	bot: TelegramBot,
@@ -38,7 +38,11 @@ const saveNewParticipantsAndNotify = async (
 			message.chat.id,
 			updatedEvent,
 			getEventDescriptionHtml(updatedEvent),
-			botMessageInlineKeyboardOptions(updatedEvent.lang, event.allowsPlusOne)
+			botMessageInlineKeyboardOptions(
+				message.reply_to_message.message_id,
+				updatedEvent.lang,
+				event.allowsPlusOne
+			)
 		);
 	});
 };

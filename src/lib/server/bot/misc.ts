@@ -1,18 +1,26 @@
 import { translate } from '../../i18n/translate.ts';
 
-export const botMessageTextOptions = JSON.stringify({
-	force_reply: true
-});
+export const botMessageTextOptions = (originalMessageId: number) =>
+	JSON.stringify({
+		reply_to_message_id: originalMessageId,
+		force_reply: true
+	});
 
-export const ynKeyboardOptions = JSON.stringify({
-	one_time_keyboard: true,
-	input_field_placeholder: '✅',
-	keyboard: [['✅', '❌']],
-	force_reply: true,
-	resize_keyboard: true
-});
+export const ynKeyboardOptions = (originalMessageId: number) =>
+	JSON.stringify({
+		reply_to_message_id: originalMessageId,
+		one_time_keyboard: true,
+		input_field_placeholder: '✅',
+		keyboard: [['✅', '❌']],
+		force_reply: true,
+		resize_keyboard: true
+	});
 
-export const botMessageInlineKeyboardOptions = (lang: string, allowsPlusOne: boolean = false) => {
+export const botMessageInlineKeyboardOptions = (
+	originalMessageId: number,
+	lang: string,
+	allowsPlusOne: boolean = false
+) => {
 	const inlineButtons = allowsPlusOne
 		? [
 				{ text: translate('buttons.yes', lang), callback_data: 0 },
@@ -25,6 +33,7 @@ export const botMessageInlineKeyboardOptions = (lang: string, allowsPlusOne: boo
 			];
 
 	return JSON.stringify({
+		reply_to_message_id: originalMessageId,
 		inline_keyboard: [inlineButtons],
 		force_reply: true
 	});
