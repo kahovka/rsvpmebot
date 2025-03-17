@@ -85,6 +85,7 @@ export const sendNewEventMessage = async (
 ) => {
 	await bot
 		.sendMessage(message.chat.id, messageToSend, {
+			disable_notification: true,
 			...(message.message_thread_id && { message_thread_id: message.message_thread_id }),
 			...(replyMarkup && { reply_markup: replyMarkup }),
 			parse_mode: 'HTML'
