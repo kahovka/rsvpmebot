@@ -35,14 +35,10 @@ const saveNewParticipantsAndNotify = async (
 
 		await sendNewEventMessage(
 			bot,
-			message.chat.id,
+			message,
 			updatedEvent,
 			getEventDescriptionHtml(updatedEvent),
-			botMessageInlineKeyboardOptions(
-				message.reply_to_message?.message_id,
-				updatedEvent.lang,
-				event.allowsPlusOne
-			)
+			botMessageInlineKeyboardOptions(updatedEvent.lang, event.allowsPlusOne)
 		);
 	});
 };
@@ -62,7 +58,8 @@ async function registerNewParticipant(
 	) {
 		await bot.sendMessage(
 			query.message.chat.id,
-			translate('event.messages.eventIsFull', event.lang)
+			translate('event.messages.eventIsFull', event.lang),
+			event.threadId ? { message_thread_id: event.threadId } : {}
 		);
 		return;
 	}
@@ -122,7 +119,8 @@ export const registerParticipantPlusOne = async (
 		);
 		await bot.sendMessage(
 			query.message.chat.id,
-			`${translate('event.messages.noPlusOnePossible', event.lang)} ${existingParticipant && getParticipantDisplayName(existingParticipant)}`
+			`${translate('event.messages.noPlusOnePossible', event.lang)} ${existingParticipant && getParticipantDisplayName(existingParticipant)}`,
+			event.threadId ? { message_thread_id: event.threadId } : {}
 		);
 		return;
 	}
@@ -186,7 +184,8 @@ export const removeParticipant = async (
 			if (newParticipantsOntheBlock.length > 0) {
 				await bot.sendMessage(
 					query.message.chat.id,
-					`Hello ${getParticipantDisplayName(newParticipantsOntheBlock[0])}, there is a spot for you now!`
+					`Hello ${getParticipantDisplayName(newParticipantsOntheBlock[0])}, there is a spot for you now!`,
+					event.threadId ? { message_thread_id: event.threadId } : {}
 				);
 			}
 		})

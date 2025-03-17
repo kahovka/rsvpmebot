@@ -21,6 +21,7 @@ export const removeParticipantAction = async (data: DeleteParticipantActionData)
 	const pretendQuery: BotCallbackQuery = {
 		message: {
 			message_id: 0,
+			message_thread_id: event.threadId,
 			from: {
 				id: data.participantId,
 				first_name: 'Jane Doe'

@@ -51,7 +51,8 @@ export const botActionErrorCallback = (
 	logger.error('Failed ({error}) processing message: {message}', { message, error });
 	bot.sendMessage(
 		message.chat.id,
-		'Something went wrong, please try to response to the previous bot message again or start anew'
+		'Something went wrong, please try to response to the previous bot message again or start anew',
+		message.message_thread_id ? { message_thread_id: message.message_thread_id } : {}
 	);
 };
 

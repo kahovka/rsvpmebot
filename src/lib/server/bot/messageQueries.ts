@@ -30,6 +30,7 @@ export const createNewEvent = async (bot: TelegramBot, message: BotTextMessage) 
 		.then((replyMessage: TelegramBot.Message) => {
 			return eventCollection().insertOne({
 				chatId: message.chat.id,
+				threadId: message.message_thread_id,
 				ownerId: message.from.id,
 				lastMessageId: replyMessage.message_id,
 				state: RSVPEventState.NewEvent,
@@ -72,7 +73,7 @@ export const setEventDescription = async (
 				message,
 				updatedEvent,
 				setDescriptionState.messageToSend(updatedEvent.lang),
-				ynKeyboardOptions(message.reply_to_message?.message_id)
+				ynKeyboardOptions
 			);
 			await setEventState(event, RSVPEventState.DescriptionSet);
 		})
@@ -117,7 +118,7 @@ export const setParticipantLimit = async (
 					message,
 					updatedEvent,
 					setParticipantLimitState.messageToSend(updatedEvent.lang),
-					ynKeyboardOptions(message.reply_to_message?.message_id)
+					ynKeyboardOptions
 				);
 				await setEventState(event, RSVPEventState.ParticipantLimitSet);
 			}
@@ -134,11 +135,7 @@ export const setWaitlist = async (bot: TelegramBot, message: BotTextMessage, eve
 				message,
 				updatedEvent,
 				getEventDescriptionHtml(updatedEvent),
-				botMessageInlineKeyboardOptions(
-					message.reply_to_message?.message_id,
-					updatedEvent.lang,
-					event.allowsPlusOne
-				)
+				botMessageInlineKeyboardOptions(updatedEvent.lang, event.allowsPlusOne)
 			);
 			await setEventState(event, RSVPEventState.Polling);
 			// post link to ui to the chat
@@ -147,7 +144,8 @@ export const setWaitlist = async (bot: TelegramBot, message: BotTextMessage, eve
 				message.chat.id,
 				`Link to scrappy ui : [Manage ${updatedEvent.name}](${eventLink})`,
 				{
-					parse_mode: 'markdown'
+					parse_mode: 'markdown',
+					...(event.threadId && { message_thread_id: event.threadId })
 				}
 			);
 		})
