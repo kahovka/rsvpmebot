@@ -3,12 +3,12 @@
 	"unstable": ["bare-node-builtins", "webgpu", "sloppy-imports"],
 	"imports": {
 		"@logtape/logtape": "npm:@logtape/logtape@^0.8.2",
-		"node-telegram-bot-api": "npm:node-telegram-bot-api",
-		"mongodb": "npm:mongodb",
-		"dotenv": "npm:dotenv",
+		"node-telegram-bot-api": "npm:node-telegram-bot-api@0.66.0",
+		"mongodb": "npm:mongodb@6.20.0",
+		"dotenv": "npm:dotenv@17.2.3",
 		"fs": "node:fs",
-		"@faker-js/faker": "npm:@faker-js/faker",
-		"zod": "npm:zod"
+		"@faker-js/faker": "npm:@faker-js/faker@10.1.0",
+		"zod": "npm:zod@4.1.12"
 	},
 	"compilerOptions": {
 		"checkJs": true,
