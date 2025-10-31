@@ -9,7 +9,10 @@ const config = {
 	preprocess: [vitePreprocess(), mdsvex()],
 
 	kit: {
-		adapter: adapter()
+		adapter: adapter(),
+		csrf: {
+			trustedOrigins: ['*']
+		}
 	},
 
 	extensions: ['.svelte', '.svx']
