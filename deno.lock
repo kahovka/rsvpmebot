@@ -3,6 +3,7 @@
   "specifiers": {
     "jsr:@std/assert@*": "1.0.11",
     "jsr:@std/internal@^1.0.5": "1.0.5",
+    "npm:@deno/svelte-adapter@0.1": "0.1.0_@sveltejs+kit@2.48.4__@sveltejs+vite-plugin-svelte@5.1.1___svelte@5.43.2____acorn@8.15.0___vite@6.4.1____@types+node@24.2.0____picomatch@4.0.3___@types+node@24.2.0__svelte@5.43.2___acorn@8.15.0__vite@6.4.1___@types+node@24.2.0___picomatch@4.0.3__acorn@8.15.0__@types+node@24.2.0_@sveltejs+vite-plugin-svelte@5.1.1__svelte@5.43.2___acorn@8.15.0__vite@6.4.1___@types+node@24.2.0___picomatch@4.0.3__@types+node@24.2.0_svelte@5.43.2__acorn@8.15.0_vite@6.4.1__@types+node@24.2.0__picomatch@4.0.3_@types+node@24.2.0",
     "npm:@eslint/compat@^1.4.1": "1.4.1_eslint@9.38.0",
     "npm:@eslint/js@^9.38.0": "9.38.0",
     "npm:@faker-js/faker@10.1.0": "10.1.0",
@@ -26,7 +27,9 @@
     "npm:globals@^15.15.0": "15.15.0",
     "npm:jsdom@^25.0.1": "25.0.1",
     "npm:mdsvex@~0.12.6": "0.12.6_svelte@5.43.2__acorn@8.15.0",
+    "npm:mongodb@*": "6.20.0",
     "npm:mongodb@6.20.0": "6.20.0",
+    "npm:node-telegram-bot-api@*": "0.66.0_@cypress+request@3.0.9",
     "npm:node-telegram-bot-api@0.66": "0.66.0_@cypress+request@3.0.9",
     "npm:node-telegram-bot-api@0.66.0": "0.66.0_@cypress+request@3.0.9",
     "npm:prettier-plugin-svelte@^3.4.0": "3.4.0_prettier@3.6.2_svelte@5.43.2__acorn@8.15.0",
@@ -35,12 +38,14 @@
     "npm:svelte-check@^4.3.3": "4.3.3_svelte@5.43.2__acorn@8.15.0_typescript@5.9.3",
     "npm:svelte@^5.43.2": "5.43.2_acorn@8.15.0",
     "npm:tailwindcss@^4.1.16": "4.1.16",
+    "npm:ts-pattern@*": "5.9.0",
     "npm:ts-pattern@^5.9.0": "5.9.0",
     "npm:typescript-eslint@^8.46.2": "8.46.2_eslint@9.38.0_typescript@5.9.3_@typescript-eslint+parser@8.46.2__eslint@9.38.0__typescript@5.9.3",
     "npm:typescript@^5.9.3": "5.9.3",
     "npm:vite@*": "6.4.1_@types+node@24.2.0_picomatch@4.0.3",
     "npm:vite@^6.4.1": "6.4.1_@types+node@24.2.0_picomatch@4.0.3",
     "npm:vitest@^3.2.4": "3.2.4_@types+node@24.2.0_jsdom@25.0.1_vite@6.4.1__@types+node@24.2.0__picomatch@4.0.3",
+    "npm:zod@*": "4.1.12",
     "npm:zod@4.1.12": "4.1.12"
   },
   "jsr": {
@@ -141,6 +146,19 @@
         "tough-cookie@5.1.1",
         "tunnel-agent",
         "uuid@8.3.2"
+      ]
+    },
+    "@deno/experimental-route-config@0.0.5": {
+      "integrity": "sha512-0PN4qij3sC3Qm8WbiOBGlOQz8WtB0AENGkzsTHOYyPenf40iW7OGFid8QT3L8lGApnz3t6ufET0c2XgagV8Jjw==",
+      "dependencies": [
+        "urlpattern-polyfill"
+      ]
+    },
+    "@deno/svelte-adapter@0.1.0_@sveltejs+kit@2.48.4__@sveltejs+vite-plugin-svelte@5.1.1___svelte@5.43.2____acorn@8.15.0___vite@6.4.1____@types+node@24.2.0____picomatch@4.0.3___@types+node@24.2.0__svelte@5.43.2___acorn@8.15.0__vite@6.4.1___@types+node@24.2.0___picomatch@4.0.3__acorn@8.15.0__@types+node@24.2.0_@sveltejs+vite-plugin-svelte@5.1.1__svelte@5.43.2___acorn@8.15.0__vite@6.4.1___@types+node@24.2.0___picomatch@4.0.3__@types+node@24.2.0_svelte@5.43.2__acorn@8.15.0_vite@6.4.1__@types+node@24.2.0__picomatch@4.0.3_@types+node@24.2.0": {
+      "integrity": "sha512-fx4Kj1lSx1rJvjtPr3cXO7qKveI1vUyGW8jX+clJHQEqEeIDnEcBW0FpMZEVORPlay2SGydQWSGbwh4j2iENzg==",
+      "dependencies": [
+        "@deno/experimental-route-config",
+        "@sveltejs/kit"
       ]
     },
     "@esbuild/aix-ppc64@0.25.11": {
@@ -3493,6 +3511,9 @@
         "requires-port"
       ]
     },
+    "urlpattern-polyfill@10.1.0": {
+      "integrity": "sha512-IGjKp/o0NL3Bso1PymYURCJxMPNAf/ILOpendP9f5B6e1rTJgdgiOvgfoT8VxCAdY+Wisb9uhGaJJf3yZ2V9nw=="
+    },
     "util-deprecate@1.0.2": {
       "integrity": "sha512-EPD5q1uXyFxJpCrLnCc1nHnq3gOa6DZBocAIiI2TaSCA7VCJ1UJDMagCzIkXNsUYfD1daK//LTEQ8xiIbrHtcw=="
     },
@@ -3722,6 +3743,7 @@
     ],
     "packageJson": {
       "dependencies": [
+        "npm:@deno/svelte-adapter@0.1",
         "npm:@eslint/compat@^1.4.1",
         "npm:@eslint/js@^9.38.0",
         "npm:@sveltejs/adapter-node@^5.4.0",

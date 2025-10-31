@@ -5,6 +5,7 @@ node_modules
 .vercel
 .netlify
 .wrangler
+.deno-deploy
 /.svelte-kit
 /build
 
