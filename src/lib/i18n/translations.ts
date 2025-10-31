@@ -1,5 +1,5 @@
 export const availableLocales = ['en', 'ru'] as const;
-export type AvailableLocales = (typeof availableLocales)[number];
+export type AvailableLocale = (typeof availableLocales)[number];
 
 export const translations: { [key: string]: { [locale: string]: string } } = {
 	'event.state.new': { en: 'What is your event called?', ru: 'Как называется ваше мероприятие?' },

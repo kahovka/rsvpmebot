@@ -19,7 +19,7 @@ import {
 	deleteExistingMessagesAndReply,
 	getEventDescriptionHtml
 } from './utils.ts';
-import { logger } from '../../../logger.ts';
+import { logger } from '../../logger.ts';
 
 export const createNewEvent = async (bot: TelegramBot, message: BotTextMessage) => {
 	await bot

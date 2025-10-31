@@ -1,4 +1,5 @@
-import { translate } from '../../i18n/translate.ts';
+import { translate } from '$lib/i18n/translate';
+import type { AvailableLocale } from '$lib/i18n/translations';
 
 export const botMessageTextOptions = JSON.stringify({
 	force_reply: true
@@ -12,7 +13,10 @@ export const ynKeyboardOptions = JSON.stringify({
 	resize_keyboard: true
 });
 
-export const botMessageInlineKeyboardOptions = (lang: string, allowsPlusOne: boolean = false) => {
+export const botMessageInlineKeyboardOptions = (
+	lang: AvailableLocale,
+	allowsPlusOne: boolean = false
+) => {
 	const inlineButtons = allowsPlusOne
 		? [
 				{ text: translate('buttons.yes', lang), callback_data: 0 },

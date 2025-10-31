@@ -1,8 +1,8 @@
-import { MongoClient, type ObjectId } from 'npm:mongodb';
+import { MongoClient, type ObjectId } from 'mongodb';
 import { env } from '$env/dynamic/private';
-import { logger } from '../../../logger.ts';
-import { type RSVPEvent, RSVPEventState } from './types.ts';
-import { getEventNextState } from '../bot/utils.ts';
+import { logger } from '$lib/logger';
+import { type RSVPEvent, RSVPEventState } from '$lib/server/db/types';
+import { getEventNextState } from '$lib/server/bot/utils';
 
 const client = new MongoClient(env.MONGO_DB_URL ?? 'mongodb://127.0.0.1:27017');
 
@@ -10,20 +10,20 @@ export const connectToDb = async () =>
 	await client
 		.connect()
 		.then(() => logger.info`Connected to db`)
-		.catch((error) => logger.error('Could not connect to db {error}', { error }));
+		.catch((error: unknown) => logger.error('Could not connect to db {error}', { error }));
 
 export const disconnectFromDb = async () =>
 	await client
 		.connect()
 		.then(() => logger.info`Disconnected from db`)
-		.catch((error) => logger.error('Could not disconnect from db {error}', { error }));
+		.catch((error: unknown) => logger.error('Could not disconnect from db {error}', { error }));
 
 export const eventDb = () => client.db();
 
 export const eventCollection = () => client.db().collection<RSVPEvent>('events');
 export const updateEventById = async (
 	eventId: ObjectId,
-	query: { [key: string]: any }
+	query: { [key: string]: unknown }
 ): Promise<RSVPEvent> =>
 	await eventCollection()
 		.findOneAndUpdate(
@@ -33,7 +33,7 @@ export const updateEventById = async (
 			},
 			{ upsert: true, returnDocument: 'after' }
 		)
-		.then((updatedEvent: RSVPEvent | undefined) => {
+		.then((updatedEvent) => {
 			if (!updatedEvent) {
 				throw `No event found to update, ${eventId}`;
 			}

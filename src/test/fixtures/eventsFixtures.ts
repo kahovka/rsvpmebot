@@ -1,6 +1,7 @@
 import { ObjectId } from 'mongodb';
 import { faker } from '@faker-js/faker';
-import { RSVPEvent, RSVPEventParticipant, RSVPEventState } from '../../lib/server/db/types.ts';
+import type { RSVPEvent, RSVPEventParticipant } from '$lib/server/db/types';
+import { RSVPEventState } from '$lib/server/db/types';
 
 export const fakeParticipant = (): RSVPEventParticipant => ({
 	tgid: faker.number.int(),

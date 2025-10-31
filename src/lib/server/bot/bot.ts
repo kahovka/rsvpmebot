@@ -1,9 +1,9 @@
 import { env } from '$env/dynamic/private';
-import TelegramBot from 'npm:node-telegram-bot-api';
-import { match } from 'npm:ts-pattern';
-import { logger } from '../../../logger.ts';
-import { getEvent } from '../db/mongo.ts';
-import { RSVPEventState } from '../db/types.ts';
+import TelegramBot from 'node-telegram-bot-api';
+import { match } from 'ts-pattern';
+import { logger } from '$lib/logger';
+import { getEvent } from '$lib/server/db/mongo';
+import { RSVPEventState } from '$lib/server/db/types';
 import {
 	registerParticipant,
 	registerParticipantPlusOne,

@@ -1,10 +1,10 @@
-import TelegramBot from 'npm:node-telegram-bot-api';
-import { logger } from '../../../logger.ts';
-import { translate } from '../../i18n/translate.ts';
-import { updateEventById } from '../db/mongo.ts';
-import type { RSVPEvent, RSVPEventParticipant } from '../db/types.ts';
-import { botMessageInlineKeyboardOptions } from './misc.ts';
-import type { BotCallbackQuery, BotTextMessage } from './schemata.ts';
+import TelegramBot from 'node-telegram-bot-api';
+import { logger } from '$lib/logger';
+import { translate } from '$lib/i18n/translate';
+import { updateEventById } from '$lib/server/db/mongo';
+import type { RSVPEvent, RSVPEventParticipant } from '$lib/server/db/types';
+import { botMessageInlineKeyboardOptions } from '$lib/server/bot/misc';
+import type { BotCallbackQuery, BotTextMessage } from '$lib/server/bot/schemata';
 import {
 	botActionErrorCallback,
 	getEventDescriptionHtml,
@@ -19,28 +19,29 @@ const saveNewParticipantsAndNotify = async (
 	newParticipantsList: RSVPEventParticipant[],
 	newWaitingList: RSVPEventParticipant[]
 ) => {
-	await updateEventById(event._id, {
-		participantsList: newParticipantsList,
-		...(event?.hasWaitlist && { waitlingList: newWaitingList })
-	}).then(async (updatedEvent) => {
-		// try delete previous announcement, sometimes fails
-		try {
-			await bot.deleteMessage(message.chat.id, event.lastMessageId);
-		} catch (error) {
-			logger.debug('Could not delete last message: {eventId} {messageId} ', {
-				eventId: event._id,
-				messageId: message.chat.id
-			});
-		}
+	event._id &&
+		(await updateEventById(event._id, {
+			participantsList: newParticipantsList,
+			...(event?.hasWaitlist && { waitlingList: newWaitingList })
+		}).then(async (updatedEvent) => {
+			// try delete previous announcement, sometimes fails
+			try {
+				await bot.deleteMessage(message.chat.id, event.lastMessageId);
+			} catch (error) {
+				logger.debug('Could not delete last message: {eventId} {messageId} ', {
+					eventId: event._id,
+					messageId: message.chat.id
+				});
+			}
 
-		await sendNewEventMessage(
-			bot,
-			message,
-			updatedEvent,
-			getEventDescriptionHtml(updatedEvent),
-			botMessageInlineKeyboardOptions(updatedEvent.lang, event.allowsPlusOne)
-		);
-	});
+			await sendNewEventMessage(
+				bot,
+				message,
+				updatedEvent,
+				getEventDescriptionHtml(updatedEvent),
+				botMessageInlineKeyboardOptions(updatedEvent.lang, event.allowsPlusOne)
+			);
+		}));
 };
 
 async function registerNewParticipant(

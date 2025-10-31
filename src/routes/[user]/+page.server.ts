@@ -1,7 +1,7 @@
-import { eventCollection } from '$lib/server/db/mongo.ts';
-import type { RSVPEvent } from '$lib/server/db/types.ts';
-import { toDisplayEvent } from '$lib/types/DisplayEvent.ts';
-import { logger } from '../../logger';
+import { eventCollection } from '$lib/server/db/mongo';
+import type { RSVPEvent } from '$lib/server/db/types';
+import { toDisplayEvent } from '$lib/types/DisplayEvent';
+import { logger } from '$lib/logger';
 import type { PageServerLoad } from './$types';
 
 export const load: PageServerLoad = async ({ params }) => {

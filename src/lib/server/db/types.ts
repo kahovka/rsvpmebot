@@ -1,4 +1,5 @@
-import { ObjectId } from 'npm:mongodb';
+import type { AvailableLocale } from '$lib/i18n/translations';
+import { ObjectId } from 'mongodb';
 
 export interface RSVPEvent {
 	_id?: ObjectId;
@@ -7,7 +8,7 @@ export interface RSVPEvent {
 	ownerId: number;
 	lastMessageId: number;
 	state: RSVPEventState;
-	lang: string;
+	lang: AvailableLocale;
 	hasWaitlist?: boolean;
 	allowsPlusOne?: boolean;
 	name?: string;

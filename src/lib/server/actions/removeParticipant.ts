@@ -1,9 +1,9 @@
-import { ObjectId } from 'npm:mongodb';
-import { z } from 'npm:zod';
-import { getEventById } from '../db/mongo';
-import type { BotCallbackQuery } from '../bot/schemata';
-import { removeParticipant } from '../bot/callbackQueries';
-import { bot } from '../bot/bot';
+import { ObjectId } from 'mongodb';
+import { z } from 'zod';
+import { getEventById } from '$lib/server/db/mongo';
+import type { BotCallbackQuery } from '$lib/server/bot/schemata';
+import { removeParticipant } from '$lib/server/bot/callbackQueries';
+import { bot } from '$lib/server/bot/bot';
 
 export const DeleteParticipantActionSchema = z.object({
 	eventId: z.string(),

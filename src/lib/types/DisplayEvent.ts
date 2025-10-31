@@ -1,4 +1,4 @@
-import type { RSVPEvent, RSVPEventParticipant } from '../server/db/types.ts';
+import type { RSVPEvent, RSVPEventParticipant } from '$lib/server/db/types';
 
 export interface DisplayEvent {
 	id: string;

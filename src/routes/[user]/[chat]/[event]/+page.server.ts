@@ -1,8 +1,8 @@
 import { eventCollection } from '$lib/server/db/mongo';
 import { type RSVPEvent } from '$lib/server/db/types';
 import { toDisplayEvent } from '$lib/types/DisplayEvent';
-import { logger } from '../../../../logger';
-import { ObjectId } from 'npm:mongodb';
+import { logger } from '$lib/logger';
+import { ObjectId } from 'mongodb';
 import type { PageServerLoad } from './$types';
 import {
 	DeleteParticipantActionSchema,

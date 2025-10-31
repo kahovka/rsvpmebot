@@ -1,6 +1,6 @@
 import TelegramBot from 'npm:node-telegram-bot-api';
 import { match } from 'npm:ts-pattern';
-import { logger } from '../../../logger.ts';
+import { logger } from '../../logger.ts';
 import { translate } from '../../i18n/translate.ts';
 import { updateEventById } from '../db/mongo.ts';
 import { type RSVPEvent, type RSVPEventParticipant, RSVPEventState } from '../db/types.ts';
