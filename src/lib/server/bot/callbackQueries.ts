@@ -1,53 +1,30 @@
 import TelegramBot from 'node-telegram-bot-api';
-import { logger } from '$lib/logger';
 import { translate } from '$lib/i18n/translate';
 import { updateEventById } from '$lib/server/db/mongo';
-import type { RSVPEvent, RSVPEventParticipant } from '$lib/server/db/types';
-import { botMessageInlineKeyboardOptions } from '$lib/server/bot/misc';
+import type { RSVPEventParticipant, RSVPEventWithId } from '$lib/server/db/types';
 import type { BotCallbackQuery, BotTextMessage } from '$lib/server/bot/schemata';
-import {
-	botActionErrorCallback,
-	getEventDescriptionHtml,
-	getParticipantDisplayName,
-	sendNewEventMessage
-} from './utils.ts';
+import { botActionErrorCallback, getParticipantDisplayName, sendEventForPolling } from './utils.ts';
 
 const saveNewParticipantsAndNotify = async (
 	bot: TelegramBot,
 	message: BotTextMessage,
-	event: RSVPEvent,
+	event: RSVPEventWithId,
 	newParticipantsList: RSVPEventParticipant[],
 	newWaitingList: RSVPEventParticipant[]
 ) => {
-	event._id &&
-		(await updateEventById(event._id, {
-			participantsList: newParticipantsList,
-			...(event?.hasWaitlist && { waitlingList: newWaitingList })
-		}).then(async (updatedEvent) => {
-			// try delete previous announcement, sometimes fails
-			try {
-				await bot.deleteMessage(message.chat.id, event.lastMessageId);
-			} catch (error) {
-				logger.debug('Could not delete last message: {eventId} {messageId} ', {
-					eventId: event._id,
-					messageId: message.chat.id
-				});
-			}
-
-			await sendNewEventMessage(
-				bot,
-				message,
-				updatedEvent,
-				getEventDescriptionHtml(updatedEvent),
-				botMessageInlineKeyboardOptions(updatedEvent.lang, event.allowsPlusOne)
-			);
-		}));
+	await updateEventById(event._id, {
+		participantsList: newParticipantsList,
+		...(event?.hasWaitlist && { waitlingList: newWaitingList })
+	}).then(async (updatedEvent) => {
+		bot.deleteMessage(message.chat.id, event.lastMessageId);
+		await sendEventForPolling(bot, message, updatedEvent);
+	});
 };
 
 async function registerNewParticipant(
 	bot: TelegramBot,
 	query: BotCallbackQuery,
-	event: RSVPEvent,
+	event: RSVPEventWithId,
 	newParticipant: RSVPEventParticipant
 ) {
 	const allParticipants = [...(event.participantsList ?? []), ...(event.waitlingList ?? [])];
@@ -87,7 +64,7 @@ async function registerNewParticipant(
 export const registerParticipant = async (
 	bot: TelegramBot,
 	query: BotCallbackQuery,
-	event: RSVPEvent
+	event: RSVPEventWithId
 ) => {
 	// push participant
 	const newParticipant: RSVPEventParticipant = {
@@ -109,7 +86,7 @@ export const registerParticipant = async (
 export const registerParticipantPlusOne = async (
 	bot: TelegramBot,
 	query: BotCallbackQuery,
-	event: RSVPEvent
+	event: RSVPEventWithId
 ) => {
 	const participantId = query.from.id;
 	const allParticipants = [...(event.participantsList ?? []), ...(event.waitlingList ?? [])];
@@ -138,7 +115,7 @@ export const registerParticipantPlusOne = async (
 export const removeParticipant = async (
 	bot: TelegramBot,
 	query: BotCallbackQuery,
-	event: RSVPEvent
+	event: RSVPEventWithId
 ) => {
 	const participantToRemoveId = query.from.id;
 
