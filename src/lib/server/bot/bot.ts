@@ -53,18 +53,18 @@ bot.on('message', async (raw_message: TelegramBot.Message) => {
 		}
 
 		await match(existingEvent.state)
-			.with(RSVPEventState.NewEvent, async () => await setEventName(bot, message, existingEvent))
+			.with(RSVPEventState.NewEvent, async () => await setEventName(bot, existingEvent.id, message))
 			.with(
 				RSVPEventState.NameSet,
-				async () => await setEventDescription(bot, message, existingEvent)
+				async () => await setEventDescription(bot, existingEvent.id, message)
 			)
 			.with(
 				RSVPEventState.DescriptionSet,
-				async () => await setPlusOneOption(bot, message, existingEvent)
+				async () => await setPlusOneOption(bot, existingEvent.id, message)
 			)
 			.with(
 				RSVPEventState.PlusOneSet,
-				async () => await setParticipantLimit(bot, message, existingEvent)
+				async () => await setParticipantLimit(bot, existingEvent.id, message)
 			)
 			.with(
 				RSVPEventState.ParticipantLimitSet,
