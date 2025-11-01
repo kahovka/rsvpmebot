@@ -1,8 +1,13 @@
 import { translate } from '$lib/i18n/translate';
 import type { AvailableLocale } from '$lib/i18n/translations';
 
-export const botMessageTextOptions = JSON.stringify({
+export const botMessageReplyTextOptions = JSON.stringify({
 	force_reply: true
+});
+
+export const botMessageReplyYNTextOptions = JSON.stringify({
+	force_reply: true,
+	input_field_placeholder: '✅'
 });
 
 export const ynKeyboardOptions = JSON.stringify({

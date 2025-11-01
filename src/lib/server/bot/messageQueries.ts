@@ -11,6 +11,8 @@ import {
 } from './botStates.ts';
 import {
 	botMessageInlineKeyboardOptions,
+	botMessageReplyTextOptions,
+	botMessageReplyYNTextOptions,
 	botMessageTextOptions,
 	ynKeyboardOptions
 } from './misc.ts';
@@ -33,7 +35,7 @@ export const createNewEvent = async (bot: TelegramBot, message: BotTextMessage) 
 			message.chat.id,
 			newEventState.messageToSend(parseLocale(message.from.language_code)),
 			{
-				reply_markup: botMessageTextOptions,
+				reply_markup: botMessageReplyTextOptions,
 				...(message.message_thread_id && { message_thread_id: message.message_thread_id })
 			}
 		)
@@ -72,7 +74,7 @@ export const setEventName = async (
 				message,
 				eventId,
 				setNameState.messageToSend(updatedEvent.lang),
-				botMessageTextOptions
+				botMessageReplyTextOptions
 			);
 		})
 		.catch((error: unknown) => botActionErrorCallback(error, bot, message));
@@ -97,7 +99,7 @@ export const setEventDescription = async (
 				message,
 				eventId,
 				setDescriptionState.messageToSend(updatedEvent.lang),
-				ynKeyboardOptions
+				botMessageReplyYNTextOptions
 			);
 		})
 		.catch((error: unknown) => botActionErrorCallback(error, bot, message));

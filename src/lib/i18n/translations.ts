@@ -14,16 +14,16 @@ export const translations: { [key: string]: { [locale: string]: string } } = {
 		ru: 'У вашего мероприятия есть какие-нибудь подробности?'
 	},
 	'event.state.setPlusOne': {
-		en: 'Can people bring someone along?',
-		ru: 'Можно ли прийти с кем-то?'
+		en: 'Can people bring someone along? Use ✅ for yes, anything else for no',
+		ru: 'Можно ли прийти с кем-то? Да - ✅, нет - любой иной символ'
 	},
 	'event.state.setParticipantLimit': {
 		en: 'Does you event have participant limit? [Enter number of participants, 0 or anything for no]',
 		ru: 'Ограничено ли количество участников вашего мероприятия? [Укажите число участников, или  0, чтобы отменить лимит если лимит не требуется]'
 	},
 	'event.state.setWaitlist': {
-		en: 'Does you event have a waiting list?',
-		ru: 'Есть ли у вашего мероприятия лист ожидания?'
+		en: 'Does you event have a waiting list? Use ✅ for yes, anything else for no',
+		ru: 'Есть ли у вашего мероприятия лист ожидания? Да - ✅, нет - любой иной символ'
 	},
 	'event.getDescription.participantLimit': { en: 'Max Participants:', ru: 'Максимум участников:' },
 	'event.getDescription.particpants': { en: 'Participants:', ru: 'Участники:' },
