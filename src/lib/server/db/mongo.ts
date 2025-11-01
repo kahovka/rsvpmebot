@@ -40,12 +40,12 @@ export const updateEventById = async (
 			return updatedEvent;
 		});
 
-export const setEventState = async (event: RSVPEvent, nextState: RSVPEventState | undefined) => {
+export const setEventState = async (eventId: ObjectId, nextState: RSVPEventState) => {
 	await eventCollection().findOneAndUpdate(
-		{ _id: event._id },
+		{ _id: eventId },
 		{
 			$set: {
-				state: nextState ?? getEventNextState(event)
+				state: nextState
 			}
 		},
 		{ upsert: true }

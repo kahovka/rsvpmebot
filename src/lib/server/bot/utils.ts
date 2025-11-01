@@ -1,5 +1,5 @@
-import TelegramBot from 'npm:node-telegram-bot-api';
-import { match } from 'npm:ts-pattern';
+import TelegramBot from 'node-telegram-bot-api';
+import { match } from 'ts-pattern';
 import { logger } from '../../logger.ts';
 import { translate } from '../../i18n/translate.ts';
 import { updateEventById } from '../db/mongo.ts';
@@ -12,6 +12,7 @@ import {
 	setWaitlist
 } from './botStates.ts';
 import type { BotTextMessage } from './schemata.ts';
+import type { ObjectId } from 'mongodb';
 
 export const getParticipantDisplayName = (participant: RSVPEventParticipant) =>
 	`${participant.firstName}${participant.username ? ' (@' + participant.username + ')' : ''}`;
@@ -79,7 +80,7 @@ export const deleteExistingMessagesAndReply = async (
 export const sendNewEventMessage = async (
 	bot: TelegramBot,
 	message: BotTextMessage,
-	event: RSVPEvent,
+	eventId: ObjectId,
 	messageToSend: string,
 	replyMarkup: string
 ) => {
@@ -91,6 +92,6 @@ export const sendNewEventMessage = async (
 			parse_mode: 'HTML'
 		})
 		.then((replyMessage: TelegramBot.Message) => {
-			updateEventById(event._id, { lastMessageId: replyMessage.message_id });
+			updateEventById(eventId, { lastMessageId: replyMessage.message_id });
 		});
 };
