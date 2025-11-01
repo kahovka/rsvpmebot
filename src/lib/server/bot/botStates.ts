@@ -1,4 +1,4 @@
-import type { AvailableLocale } from '$lib/i18n/translations.ts';
+import type { AvailableLocale } from '$lib/i18n/translations';
 import { translate } from '../../i18n/translate.ts';
 import { RSVPEventState } from '../db/types.ts';
 
@@ -23,19 +23,19 @@ export const setNameState: BotState = {
 export const setDescriptionState: BotState = {
 	state: RSVPEventState.NameSet,
 	nextState: RSVPEventState.DescriptionSet,
-	messageToSend: (locale: string) => translate('event.state.setPlusOne', locale)
+	messageToSend: (locale: AvailableLocale) => translate('event.state.setPlusOne', locale)
 };
 
 export const setPlusOneState: BotState = {
 	state: RSVPEventState.DescriptionSet,
 	nextState: RSVPEventState.PlusOneSet,
-	messageToSend: (locale: string) => translate('event.state.setParticipantLimit', locale)
+	messageToSend: (locale: AvailableLocale) => translate('event.state.setParticipantLimit', locale)
 };
 
 export const setParticipantLimitState: BotState = {
 	state: RSVPEventState.PlusOneSet,
 	nextState: RSVPEventState.ParticipantLimitSet,
-	messageToSend: (locale: string) => translate('event.state.setWaitlist', locale)
+	messageToSend: (locale: AvailableLocale) => translate('event.state.setWaitlist', locale)
 };
 
 export const setWaitlist: BotState = {

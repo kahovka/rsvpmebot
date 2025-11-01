@@ -1,8 +1,7 @@
 import { MongoClient, type ObjectId, type WithId } from 'mongodb';
 import { env } from '$env/dynamic/private';
 import { logger } from '$lib/logger';
-import { type RSVPEvent, RSVPEventState } from '$lib/server/db/types';
-import { getEventNextState } from '$lib/server/bot/utils';
+import { type RSVPEvent, type RSVPEventWithId } from '$lib/server/db/types';
 
 const client = new MongoClient(env.MONGO_DB_URL ?? 'mongodb://127.0.0.1:27017');
 
@@ -24,7 +23,7 @@ export const eventCollection = () => client.db().collection<RSVPEvent>('events')
 export const updateEventById = async (
 	eventId: ObjectId,
 	query: { [key: string]: unknown }
-): Promise<RSVPEvent> =>
+): Promise<RSVPEventWithId> =>
 	await eventCollection()
 		.findOneAndUpdate(
 			{ _id: eventId },
@@ -40,17 +39,6 @@ export const updateEventById = async (
 			return updatedEvent;
 		});
 
-export const setEventState = async (eventId: ObjectId, nextState: RSVPEventState) => {
-	await eventCollection().findOneAndUpdate(
-		{ _id: eventId },
-		{
-			$set: {
-				state: nextState
-			}
-		},
-		{ upsert: true }
-	);
-};
 export const getEventById = async (eventId: ObjectId) =>
 	await eventCollection().findOne({
 		_id: eventId

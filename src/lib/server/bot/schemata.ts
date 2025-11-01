@@ -1,4 +1,4 @@
-import { z } from 'npm:zod';
+import { z } from 'zod';
 
 const userSchema = z.object({
 	id: z.number(),

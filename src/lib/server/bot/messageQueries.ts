@@ -1,6 +1,5 @@
 import TelegramBot from 'node-telegram-bot-api';
-import { env } from '$env/dynamic/private';
-import { eventCollection, setEventState, updateEventById } from '../db/mongo.ts';
+import { eventCollection, updateEventById } from '../db/mongo.ts';
 import { type RSVPEvent, RSVPEventState } from '../db/types.ts';
 import {
 	newEventState,
@@ -9,24 +8,17 @@ import {
 	setParticipantLimitState,
 	setPlusOneState
 } from './botStates.ts';
-import {
-	botMessageInlineKeyboardOptions,
-	botMessageReplyTextOptions,
-	botMessageReplyYNTextOptions,
-	ynKeyboardOptions
-} from './misc.ts';
+import { botMessageReplyTextOptions, botMessageReplyYNTextOptions } from './misc.ts';
 import type { BotTextMessage } from './schemata.ts';
 import {
 	botActionErrorCallback,
-	deleteExistingMessagesAndReply,
-	getEventDescriptionHtml,
+	postEventManageLink,
+	sendEventForPolling,
 	sendNewEventMessage
 } from './utils.ts';
 import { logger } from '$lib/logger';
 import { ObjectId } from 'mongodb';
 import { parseLocale } from '$lib/i18n/translations';
-
-const ui_address = env.UI_HOST;
 
 export const createNewEvent = async (bot: TelegramBot, message: BotTextMessage) => {
 	await bot
@@ -110,16 +102,19 @@ export const setPlusOneOption = async (
 	message: BotTextMessage
 ) => {
 	const allowsPlusOne = message.text.includes('✅') ? true : false;
-	await updateEventById(eventId, { allowsPlusOne })
+	await updateEventById(eventId, { allowsPlusOne, state: RSVPEventState.PlusOneSet })
 		.then(async (updatedEvent: RSVPEvent) => {
-			await deleteExistingMessagesAndReply(
+			// allow to fail, do not await
+			bot.deleteMessage(message.chat.id, updatedEvent.lastMessageId); // previous text message from the bot
+			bot.deleteMessage(message.chat.id, message.message_id); // reply message to it
+
+			await sendNewEventMessage(
 				bot,
 				message,
-				updatedEvent,
+				eventId,
 				setPlusOneState.messageToSend(updatedEvent.lang),
 				botMessageReplyTextOptions
 			);
-			await setEventState(eventId, RSVPEventState.PlusOneSet);
 		})
 		.catch((error: unknown) => botActionErrorCallback(error, bot, message));
 };
@@ -130,49 +125,39 @@ export const setParticipantLimit = async (
 	message: BotTextMessage
 ) => {
 	const participantLimit = Number(message.text) || 0;
-	await updateEventById(eventId, { participantLimit })
+	await updateEventById(eventId, { participantLimit, state: RSVPEventState.ParticipantLimitSet })
 		.then(async (updatedEvent) => {
 			if (participantLimit === 0) {
-				await setEventState(eventId, RSVPEventState.ParticipantLimitSet);
 				// do not sent message, we know waitlist is not needed
-				await setWaitlist(bot, { ...message, text: 'no waitlist needed' }, updatedEvent);
+				await setWaitlist(bot, eventId, { ...message, text: 'no waitlist needed' });
 			} else {
-				await deleteExistingMessagesAndReply(
+				// allow to fail, do not await
+				bot.deleteMessage(message.chat.id, updatedEvent.lastMessageId); // previous text message from the bot
+				bot.deleteMessage(message.chat.id, message.message_id); // reply message to it
+
+				await sendNewEventMessage(
 					bot,
 					message,
-					updatedEvent,
+					eventId,
 					setParticipantLimitState.messageToSend(updatedEvent.lang),
-					ynKeyboardOptions
+					botMessageReplyYNTextOptions
 				);
-				await setEventState(eventId, RSVPEventState.ParticipantLimitSet);
 			}
 		})
 		.catch((error: unknown) => botActionErrorCallback(error, bot, message));
 };
 
-export const setWaitlist = async (bot: TelegramBot, message: BotTextMessage, event: RSVPEvent) => {
+export const setWaitlist = async (bot: TelegramBot, eventId: ObjectId, message: BotTextMessage) => {
 	const hasWaitlist = message.text.includes('✅') ? true : false;
-	event._id &&
-		(await updateEventById(event._id, { hasWaitlist })
-			.then(async (updatedEvent) => {
-				await deleteExistingMessagesAndReply(
-					bot,
-					message,
-					updatedEvent,
-					getEventDescriptionHtml(updatedEvent),
-					botMessageInlineKeyboardOptions(updatedEvent.lang, event.allowsPlusOne)
-				);
-				event._id && (await setEventState(event._id, RSVPEventState.Polling));
-				// post link to ui to the chat
-				const eventLink = `https://${ui_address}/${updatedEvent.ownerId}/${updatedEvent.chatId}/${updatedEvent._id}`;
-				await bot.sendMessage(
-					message.chat.id,
-					`Link to scrappy ui : [Manage ${updatedEvent.name}](${eventLink})`,
-					{
-						parse_mode: 'markdown',
-						...(event.threadId && { message_thread_id: event.threadId })
-					}
-				);
-			})
-			.catch((error: unknown) => botActionErrorCallback(error, bot, message)));
+	await updateEventById(eventId, { hasWaitlist, state: RSVPEventState.Polling })
+		.then(async (updatedEvent) => {
+			// allow to fail, do not await
+			bot.deleteMessage(message.chat.id, updatedEvent.lastMessageId); // previous text message from the bot
+			bot.deleteMessage(message.chat.id, message.message_id); // reply message to it
+
+			await postEventManageLink(bot, message, updatedEvent);
+
+			await sendEventForPolling(bot, message, updatedEvent);
+		})
+		.catch((error: unknown) => botActionErrorCallback(error, bot, message));
 };

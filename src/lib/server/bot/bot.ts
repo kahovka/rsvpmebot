@@ -17,7 +17,6 @@ import {
 	setPlusOneOption,
 	setWaitlist
 } from './messageQueries.ts';
-import type { WithId } from 'mongodb';
 import { BotCallbackQuerySchema, BotTextMessageSchema } from './schemata.ts';
 
 export const bot = new TelegramBot(env.BOT_TOKEN ?? 'no token provided');
@@ -78,7 +77,7 @@ bot.on('message', async (raw_message: TelegramBot.Message) => {
 			)
 			.with(
 				RSVPEventState.ParticipantLimitSet,
-				async () => await setWaitlist(bot, message, existingEvent)
+				async () => await setWaitlist(bot, existingEvent._id, message)
 			)
 			.otherwise(() =>
 				logger.debug('Could not match event: {event} with message {message}', {
@@ -99,10 +98,11 @@ bot.on('callback_query', async (raw_query: TelegramBot.CallbackQuery) => {
 
 		if (!existingEvent || existingEvent.state !== RSVPEventState.Polling) {
 			logger.error(
-				'Could not find event or event is not in the polling state: {eventId}, requested by message: {message}',
+				'Could not find event or event is not in the polling state: {eventId} is state {state}, requested by message: {message}',
 				{
 					message: JSON.stringify(query),
-					eventId: existingEvent?._id
+					eventId: existingEvent?._id,
+					state: existingEvent?.state
 				}
 			);
 			return;
