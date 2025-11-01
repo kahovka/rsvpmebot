@@ -1,4 +1,4 @@
-import { MongoClient, type ObjectId } from 'mongodb';
+import { MongoClient, type ObjectId, type WithId } from 'mongodb';
 import { env } from '$env/dynamic/private';
 import { logger } from '$lib/logger';
 import { type RSVPEvent, RSVPEventState } from '$lib/server/db/types';
@@ -56,7 +56,10 @@ export const getEventById = async (eventId: ObjectId) =>
 		_id: eventId
 	});
 
-export const getEvent = async (chatId: number, lastBotMessageId: number) =>
+export const getEvent = async (
+	chatId: number,
+	lastBotMessageId: number
+): Promise<WithId<RSVPEvent> | null> =>
 	await eventCollection().findOne({
 		chatId: chatId,
 		lastMessageId: lastBotMessageId

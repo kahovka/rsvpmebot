@@ -1,5 +1,5 @@
 import type { AvailableLocale } from '$lib/i18n/translations';
-import { ObjectId } from 'mongodb';
+import { ObjectId, type WithId } from 'mongodb';
 
 export interface RSVPEvent {
 	_id?: ObjectId;
@@ -17,6 +17,8 @@ export interface RSVPEvent {
 	participantsList?: RSVPEventParticipant[];
 	waitlingList?: RSVPEventParticipant[];
 }
+
+export type RSVPEventWithId = WithId<RSVPEvent>;
 
 export interface RSVPEventParticipant {
 	tgid: number;

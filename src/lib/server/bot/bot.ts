@@ -3,7 +3,7 @@ import TelegramBot from 'node-telegram-bot-api';
 import { match } from 'ts-pattern';
 import { logger } from '$lib/logger';
 import { getEvent } from '$lib/server/db/mongo';
-import { RSVPEventState } from '$lib/server/db/types';
+import { RSVPEventState, type RSVPEvent, type RSVPEventWithId } from '$lib/server/db/types';
 import {
 	registerParticipant,
 	registerParticipantPlusOne,
@@ -17,6 +17,7 @@ import {
 	setPlusOneOption,
 	setWaitlist
 } from './messageQueries.ts';
+import type { WithId } from 'mongodb';
 import { BotCallbackQuerySchema, BotTextMessageSchema } from './schemata.ts';
 
 export const bot = new TelegramBot(env.BOT_TOKEN ?? 'no token provided');
@@ -41,7 +42,7 @@ bot.onText(/^\/event.*/, async (raw_message: TelegramBot.Message) => {
 bot.on('message', async (raw_message: TelegramBot.Message) => {
 	try {
 		const message = BotTextMessageSchema.parse(raw_message);
-		const existingEvent =
+		const existingEvent: RSVPEventWithId | null =
 			message.reply_to_message &&
 			(await getEvent(message.chat.id, message.reply_to_message?.message_id));
 
@@ -53,18 +54,21 @@ bot.on('message', async (raw_message: TelegramBot.Message) => {
 		}
 
 		await match(existingEvent.state)
-			.with(RSVPEventState.NewEvent, async () => await setEventName(bot, existingEvent.id, message))
+			.with(
+				RSVPEventState.NewEvent,
+				async () => await setEventName(bot, existingEvent._id, message)
+			)
 			.with(
 				RSVPEventState.NameSet,
-				async () => await setEventDescription(bot, existingEvent.id, message)
+				async () => await setEventDescription(bot, existingEvent._id, message)
 			)
 			.with(
 				RSVPEventState.DescriptionSet,
-				async () => await setPlusOneOption(bot, existingEvent.id, message)
+				async () => await setPlusOneOption(bot, existingEvent._id, message)
 			)
 			.with(
 				RSVPEventState.PlusOneSet,
-				async () => await setParticipantLimit(bot, existingEvent.id, message)
+				async () => await setParticipantLimit(bot, existingEvent._id, message)
 			)
 			.with(
 				RSVPEventState.ParticipantLimitSet,
