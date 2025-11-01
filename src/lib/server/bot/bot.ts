@@ -42,9 +42,15 @@ bot.onText(/^\/event.*/, async (raw_message: TelegramBot.Message) => {
 bot.on('message', async (raw_message: TelegramBot.Message) => {
 	try {
 		const message = BotTextMessageSchema.parse(raw_message);
-		const existingEvent: RSVPEventWithId | null =
-			message.reply_to_message &&
-			(await getEvent(message.chat.id, message.reply_to_message?.message_id));
+		const replyToMessageId = message.reply_to_message?.message_id;
+
+		if (!replyToMessageId) {
+			logger.debug('There is no message to reply to: {message}', {
+				message: JSON.stringify(message)
+			});
+			return;
+		}
+		const existingEvent: RSVPEventWithId | null = await getEvent(message.chat.id, replyToMessageId);
 
 		if (!existingEvent) {
 			logger.debug('Could not find event or parse message: {message}', {

@@ -5,16 +5,19 @@ export const parseLocale = (userLocale: string | undefined): AvailableLocale =>
 	userLocale && userLocale in availableLocales ? (userLocale as AvailableLocale) : 'en';
 
 export const translations: { [key: string]: { [locale: string]: string } } = {
-	'event.state.new': { en: 'What is your event called?', ru: 'Как называется ваше мероприятие?' },
 	'event.state.setName': {
+		en: 'What is your event called?',
+		ru: 'Как называется ваше мероприятие?'
+	},
+	'event.state.setDescription': {
 		en: 'Does your event have some description?',
 		ru: 'У вашего мероприятия есть какие-нибудь подробности?'
 	},
-	'event.state.setDescription': {
+	'event.state.setPlusOne': {
 		en: 'Can people bring someone along?',
 		ru: 'Можно ли прийти с кем-то?'
 	},
-	'event.state.setPlusOne': {
+	'event.state.setParticipantLimit': {
 		en: 'Does you event have participant limit? [Enter number of participants, 0 or anything for no]',
 		ru: 'Ограничено ли количество участников вашего мероприятия? [Укажите число участников, или  0, чтобы отменить лимит если лимит не требуется]'
 	},

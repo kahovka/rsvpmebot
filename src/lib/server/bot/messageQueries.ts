@@ -97,7 +97,7 @@ export const setEventDescription = async (
 				message,
 				eventId,
 				setDescriptionState.messageToSend(updatedEvent.lang),
-				botMessageTextOptions
+				ynKeyboardOptions
 			);
 		})
 		.catch((error: unknown) => botActionErrorCallback(error, bot, message));

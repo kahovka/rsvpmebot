@@ -1,34 +1,35 @@
+import type { AvailableLocale } from '$lib/i18n/translations.ts';
 import { translate } from '../../i18n/translate.ts';
 import { RSVPEventState } from '../db/types.ts';
 
 interface BotState {
 	state: RSVPEventState;
 	nextState: RSVPEventState;
-	messageToSend: (locale: string) => string;
+	messageToSend: (locale: AvailableLocale) => string;
 }
 
 export const newEventState: BotState = {
 	state: RSVPEventState.NewEvent,
 	nextState: RSVPEventState.NewEvent,
-	messageToSend: (locale: string) => translate('event.state.new', locale)
+	messageToSend: (locale: AvailableLocale) => translate('event.state.setName', locale)
 };
 
 export const setNameState: BotState = {
 	state: RSVPEventState.NewEvent,
 	nextState: RSVPEventState.NameSet,
-	messageToSend: (locale: string) => translate('event.state.setName', locale)
+	messageToSend: (locale: AvailableLocale) => translate('event.state.setDescription', locale)
 };
 
 export const setDescriptionState: BotState = {
 	state: RSVPEventState.NameSet,
 	nextState: RSVPEventState.DescriptionSet,
-	messageToSend: (locale: string) => translate('event.state.setDescription', locale)
+	messageToSend: (locale: string) => translate('event.state.setPlusOne', locale)
 };
 
 export const setPlusOneState: BotState = {
 	state: RSVPEventState.DescriptionSet,
 	nextState: RSVPEventState.PlusOneSet,
-	messageToSend: (locale: string) => translate('event.state.setPlusOne', locale)
+	messageToSend: (locale: string) => translate('event.state.setParticipantLimit', locale)
 };
 
 export const setParticipantLimitState: BotState = {
