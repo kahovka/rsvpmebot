@@ -13,7 +13,6 @@ import {
 	botMessageInlineKeyboardOptions,
 	botMessageReplyTextOptions,
 	botMessageReplyYNTextOptions,
-	botMessageTextOptions,
 	ynKeyboardOptions
 } from './misc.ts';
 import type { BotTextMessage } from './schemata.ts';
@@ -118,7 +117,7 @@ export const setPlusOneOption = async (
 				message,
 				updatedEvent,
 				setPlusOneState.messageToSend(updatedEvent.lang),
-				botMessageTextOptions
+				botMessageReplyTextOptions
 			);
 			await setEventState(eventId, RSVPEventState.PlusOneSet);
 		})
