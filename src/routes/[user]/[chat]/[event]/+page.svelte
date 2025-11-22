@@ -40,10 +40,24 @@
 			</div>
 		{/if}
 		{#if event.waitingParticipants.length > 0}
-			<p class="font-serif text-lg text-black">waiting list:</p>
-			{#each event.waitingParticipants as participant, index}
-				<p class="m-1 min-w-68">{index + 1}. {participant.name}</p>
-			{/each}
+			<p class="my-2 font-serif text-lg text-black">waiting list:</p>
+			<div class="mx-2">
+				{#each event.waitingParticipants as participant, index}
+					<form class="m-1 flex max-w-72" method="POST" action="?/deleteParticipant">
+						<input type="hidden" name="participantId" value={participant.id} />
+						<input type="hidden" name="eventId" value={event.id} />
+						<p class="min-w-68">{index + 1}. {participant.name}</p>
+						<Button
+							type="submit"
+							class="justify-self-end"
+							outline
+							color="red"
+							size="xs"
+							aria-label="delete-participant"><TrashBinOutline class="h-3 w-3" /></Button
+						>
+					</form>
+				{/each}
+			</div>
 		{/if}
 	</Card>
 
