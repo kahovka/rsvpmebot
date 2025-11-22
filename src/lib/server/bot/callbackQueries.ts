@@ -107,6 +107,24 @@ export const registerParticipantPlusOne = async (
 		);
 		return;
 	}
+
+	if (
+		allParticipants.some(
+			(participant) => participant.tgid === participantId && participant.isPlusOne
+		)
+	) {
+		const existingParticipant = allParticipants.find(
+			(participant) => participant.tgid === participantId
+		);
+
+		await bot.sendMessage(
+			query.message.chat.id,
+			`${translate('event.messages.onlyOnePlusOnePossible', event.lang)} ${existingParticipant && getParticipantDisplayName(existingParticipant)}`,
+			event.threadId ? { message_thread_id: event.threadId } : {}
+		);
+		return;
+	}
+
 	const newParticipant = {
 		tgid: query.from.id,
 		firstName: `${query.from.first_name} +1`,
