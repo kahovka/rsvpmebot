@@ -37,7 +37,10 @@ export const translations: { [key: string]: { [locale: string]: string } } = {
 		en: 'You can only bring someone if you come yourself ;)',
 		ru: 'Привести кого-то можно только придя самому ;)'
 	},
-
+	'event.messages.participantAlreadyExists': {
+		en: 'You are already on the list ;)',
+		ru: 'Мы вас уже записали ;)'
+	},
 	'buttons.yes': { en: 'Yes', ru: '👍' },
 	'buttons.plusOne': { en: '+1', ru: '+1' },
 	'buttons.no': { en: 'No', ru: '❌' }

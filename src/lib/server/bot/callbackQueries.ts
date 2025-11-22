@@ -77,6 +77,11 @@ export const registerParticipant = async (
 	// avoid duplicates
 	if (allParticipants.map(({ tgid }) => tgid).includes(newParticipant.tgid)) {
 		// this participant is already there
+		await bot.sendMessage(
+			query.message.chat.id,
+			`${getParticipantDisplayName(newParticipant)} ${translate('event.messages.participantAlreadyExists', event.lang)}`,
+			event.threadId ? { message_thread_id: event.threadId } : {}
+		);
 		return;
 	}
 
