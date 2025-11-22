@@ -1,6 +1,6 @@
 import { ObjectId } from 'mongodb';
 import { z } from 'zod';
-import { getEventById } from '$lib/server/db/mongo';
+import { getEventById, updateEventById } from '$lib/server/db/mongo';
 import type { BotCallbackQuery } from '$lib/server/bot/schemata';
 import { removeParticipant } from '$lib/server/bot/callbackQueries';
 import { bot } from '$lib/server/bot/bot';

@@ -9,6 +9,7 @@ import {
 	removeParticipantAction
 } from '$lib/server/actions/removeParticipant.js';
 import { fail } from '@sveltejs/kit';
+import { updateEventFromUI, UpdateEventFromUIActionSchema } from '$lib/server/actions/updateEvent';
 
 export const load: PageServerLoad = async ({ params }) => {
 	const event = await eventCollection().findOne<RSVPEvent>(
@@ -37,6 +38,20 @@ export const actions = {
 		try {
 			const data = DeleteParticipantActionSchema.parse(Object.fromEntries(formData));
 			await removeParticipantAction(data);
+		} catch (error: any) {
+			return fail(422, {
+				description: formData.get('description'),
+				error: error.message
+			});
+		}
+	},
+
+	updateEvent: async ({ request }) => {
+		const formData = await request.formData();
+		logger.info('updating event {data}', { data: formData });
+		try {
+			const data = UpdateEventFromUIActionSchema.parse(Object.fromEntries(formData));
+			await updateEventFromUI(data);
 		} catch (error: any) {
 			return fail(422, {
 				description: formData.get('description'),

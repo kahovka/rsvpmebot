@@ -7,6 +7,7 @@ export interface DisplayEvent {
 	chatId: number | undefined;
 	description: string;
 	numParticipants: number;
+	hasWaitingList: boolean;
 	participants: DisplayEventParticipant[];
 	waitingParticipants: DisplayEventParticipant[];
 }
@@ -24,6 +25,7 @@ export const toDisplayEvent = (event: RSVPEvent): DisplayEvent => {
 		chatId: event.chatId,
 		description: event.description ?? 'Your event details',
 		numParticipants: event.participantLimit ?? 0,
+		hasWaitingList: event.hasWaitlist ?? false,
 		participants:
 			event.participantsList?.map((participant) => toDisplayParticipant(participant)) ?? [],
 		waitingParticipants:
