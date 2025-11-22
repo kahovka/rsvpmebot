@@ -23,7 +23,7 @@ export const bot = new TelegramBot(env.BOT_TOKEN ?? 'no token provided');
 
 // match-all debug
 bot.onText(/.*/, (message: TelegramBot.Message) => {
-	logger.debug('Received something: {message}', { message });
+	logger.debug('Received something: {message}', { message: JSON.stringify(message) });
 });
 
 bot.onText(/^\/event.*/, async (raw_message: TelegramBot.Message) => {
@@ -93,6 +93,10 @@ bot.on('message', async (raw_message: TelegramBot.Message) => {
 bot.on('callback_query', async (raw_query: TelegramBot.CallbackQuery) => {
 	try {
 		const query = BotCallbackQuerySchema.parse(raw_query);
+
+		logger.debug('Received callback query: {query}. Will try to search for the survey next.', {
+			query: JSON.stringify(query)
+		});
 
 		const existingEvent = await getEvent(query.message.chat.id, query.message.message_id);
 
