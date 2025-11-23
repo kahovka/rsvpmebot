@@ -329,7 +329,6 @@
 					</div>
 				{/if}
 			</div>
-			{JSON.stringify(deletedParticipants)}
 			<input type="hidden" name="deletedParticipants" value={JSON.stringify(deletedParticipants)} />
 		</form>
 	</Card>
