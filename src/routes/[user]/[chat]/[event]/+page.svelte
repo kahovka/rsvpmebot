@@ -124,6 +124,7 @@
 							<input type="hidden" name="eventId" value={event.id} />
 							<p class="min-w-68">{index + 1}. {participant.name}</p>
 							<Button
+								hidden={!inEditing}
 								type="submit"
 								class="justify-self-end"
 								outline
@@ -144,6 +145,7 @@
 							<input type="hidden" name="eventId" value={event.id} />
 							<p class="min-w-68">{index + 1}. {participant.name}</p>
 							<Button
+								hidden={!inEditing}
 								type="submit"
 								class="justify-self-end"
 								outline
