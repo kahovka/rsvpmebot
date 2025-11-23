@@ -13,7 +13,8 @@ export const UpdateEventFromUIActionSchema = z.object({
 	eventName: z.string(),
 	eventDescription: z.string(),
 	participantLimit: z.coerce.number(),
-	hasWaitingList: z.string().toLowerCase().transform(JSON.parse).pipe(z.boolean())
+	hasWaitingList: z.string().toLowerCase().transform(JSON.parse).pipe(z.boolean()),
+	allowsPlusOne: z.string().toLowerCase().transform(JSON.parse).pipe(z.boolean())
 });
 
 export type UpdateEventFromUIActionData = z.infer<typeof UpdateEventFromUIActionSchema>;
@@ -24,9 +25,12 @@ export const updateEventFromUI = async (data: UpdateEventFromUIActionData) => {
 	if (!event) {
 		throw 'Cannot update an event since no event found';
 	}
-	// recalculculate participants with waiting list and new number
-	const allParticipants = [...(event.participantsList ?? []), ...(event.waitlingList ?? [])];
-	const maxParticipants = data.participantLimit ?? 0; // typesafety only
+	// recalculculate participants with waiting list, now number of participants and remove all plus ones if required
+	const combinedParticipants = [...(event.participantsList ?? []), ...(event.waitlingList ?? [])];
+	const allParticipants = data.allowsPlusOne
+		? combinedParticipants
+		: combinedParticipants.filter(({ isPlusOne }) => isPlusOne !== true);
+	const maxParticipants = data.participantLimit ?? 0;
 
 	const newParticipantsList = maxParticipants
 		? [...allParticipants].splice(0, maxParticipants)
@@ -36,7 +40,7 @@ export const updateEventFromUI = async (data: UpdateEventFromUIActionData) => {
 		maxParticipants && data.hasWaitingList ? [...allParticipants].splice(maxParticipants) : [];
 
 	const updateQuery: Partial<WithId<RSVPEvent>> = {
-		//	allowsPlusOne: data.alowsPlusOne, do this later
+		allowsPlusOne: data.allowsPlusOne,
 		name: data.eventName,
 		description: data.eventDescription,
 		hasWaitlist: data.hasWaitingList,

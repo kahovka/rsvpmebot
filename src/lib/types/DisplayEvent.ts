@@ -8,6 +8,7 @@ export interface DisplayEvent {
 	description: string;
 	numParticipants: number;
 	hasWaitingList: boolean;
+	allowsPlusOne: boolean;
 	participants: DisplayEventParticipant[];
 	waitingParticipants: DisplayEventParticipant[];
 }
@@ -26,6 +27,7 @@ export const toDisplayEvent = (event: RSVPEvent): DisplayEvent => {
 		description: event.description ?? 'Your event details',
 		numParticipants: event.participantLimit ?? 0,
 		hasWaitingList: event.hasWaitlist ?? false,
+		allowsPlusOne: event.allowsPlusOne ?? false,
 		participants:
 			event.participantsList?.map((participant) => toDisplayParticipant(participant)) ?? [],
 		waitingParticipants:
