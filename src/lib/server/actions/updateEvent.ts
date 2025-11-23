@@ -14,7 +14,19 @@ export const UpdateEventFromUIActionSchema = z.object({
 	eventDescription: z.string(),
 	participantLimit: z.coerce.number(),
 	hasWaitingList: z.string().toLowerCase().transform(JSON.parse).pipe(z.boolean()),
-	allowsPlusOne: z.string().toLowerCase().transform(JSON.parse).pipe(z.boolean())
+	allowsPlusOne: z.string().toLowerCase().transform(JSON.parse).pipe(z.boolean()),
+	registeredParticipants: z.preprocess(
+		(val: string) => (val ? val.split(',') : []),
+		z.array(z.coerce.number())
+	),
+	waitingParticipants: z.preprocess(
+		(val: string) => (val ? val.split(',') : []),
+		z.array(z.coerce.number())
+	),
+	deletedParticipants: z.preprocess(
+		(val: string) => (val ? val.split(',') : []),
+		z.array(z.coerce.number())
+	)
 });
 
 export type UpdateEventFromUIActionData = z.infer<typeof UpdateEventFromUIActionSchema>;
@@ -26,10 +38,42 @@ export const updateEventFromUI = async (data: UpdateEventFromUIActionData) => {
 		throw 'Cannot update an event since no event found';
 	}
 	// recalculculate participants with waiting list, now number of participants and remove all plus ones if required
+	// this is a tad tricky, if someone voted while the event was in editing, we still need to append them
 	const combinedParticipants = [...(event.participantsList ?? []), ...(event.waitlingList ?? [])];
-	const allParticipants = data.allowsPlusOne
-		? combinedParticipants
-		: combinedParticipants.filter(({ isPlusOne }) => isPlusOne !== true);
+	const additionalParticipants = combinedParticipants.filter(
+		({ tgid }) =>
+			!(
+				data.registeredParticipants.includes(tgid) ||
+				data.waitingParticipants.includes(tgid) ||
+				data.deletedParticipants.includes(tgid)
+			)
+	);
+	if (additionalParticipants.length > 0)
+		logger.info(
+			'Seems like there are more participants in the survey as in the payload {ids}. Will append them.',
+			{
+				ids: additionalParticipants
+			}
+		);
+
+	const registeredParticipants = data.registeredParticipants
+		.map((pid) => combinedParticipants.find(({ tgid }) => tgid === pid))
+		.filter((participant) => !!participant);
+	const waitingParticipants = data.waitingParticipants
+		.map((pid) => combinedParticipants.find(({ tgid }) => tgid === pid))
+		.filter((participant) => !!participant);
+
+	let allParticipants = [
+		...registeredParticipants,
+		...waitingParticipants,
+		...additionalParticipants
+	];
+	console.log(allParticipants);
+
+	// and recalculate, bacause new participants might land in any part of the list
+	allParticipants = data.allowsPlusOne
+		? allParticipants
+		: allParticipants.filter(({ isPlusOne }) => isPlusOne !== true);
 	const maxParticipants = data.participantLimit ?? 0;
 
 	const newParticipantsList = maxParticipants

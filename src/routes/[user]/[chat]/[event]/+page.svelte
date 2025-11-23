@@ -1,8 +1,15 @@
-<script>
+<script lang="ts">
 	import { Badge, Card, Toggle } from 'flowbite-svelte';
 	import { Button } from 'flowbite-svelte';
-	import { EditOutline, FloppyDiskAltOutline, TrashBinOutline } from 'flowbite-svelte-icons';
+	import {
+		EditOutline,
+		FloppyDiskAltOutline,
+		TrashBinOutline,
+		ArrowUpOutline,
+		ArrowDownOutline
+	} from 'flowbite-svelte-icons';
 	import { Input, Label, Textarea, ButtonGroup } from 'flowbite-svelte';
+	import type { DisplayEventParticipant } from '$lib/types/DisplayEvent.js';
 
 	let { data } = $props();
 	let { event } = data;
@@ -12,9 +19,25 @@
 	let hasWaitingList = $state(event.hasWaitingList);
 	let allowsPlusOne = $state(event.allowsPlusOne);
 	let inEditing = $state(false);
-	const toggleEditMode = () => {
-		inEditing = inEditing ? false : true;
-	};
+	let allParticipants = $derived.by(() => {
+		const eventParticipants = [...event.participants, ...event.waitingParticipants];
+		const x = hasWaitingList;
+		const allParticipants = allowsPlusOne
+			? eventParticipants
+			: eventParticipants.filter(({ isPlusOne }) => isPlusOne !== true);
+		return allParticipants;
+	});
+	let registeredParticipants = $derived([...allParticipants].splice(0, participantLimit));
+	let waitingParticipants = $derived(
+		hasWaitingList ? [...allParticipants].splice(participantLimit) : []
+	);
+	let deletedParticipants = $derived.by(() => {
+		const originalParticipants = [...event.participants, ...event.waitingParticipants];
+		return originalParticipants.filter(
+			(participant) =>
+				!(registeredParticipants.includes(participant) || waitingParticipants.includes(participant))
+		);
+	});
 
 	const resetFormValues = () => {
 		eventName = event.name;
@@ -22,14 +45,70 @@
 		participantLimit = event.numParticipants;
 		hasWaitingList = event.hasWaitingList;
 		allowsPlusOne = event.allowsPlusOne;
+		allParticipants = [...event.participants, ...event.waitingParticipants];
+		registeredParticipants = event.participants;
+		waitingParticipants = event.waitingParticipants;
 		inEditing = false;
+	};
+
+	const isFirstParticipant = (participant: DisplayEventParticipant) =>
+		allParticipants.findIndex((member) => member === participant) === 0;
+
+	const isLastParticipant = (participant: DisplayEventParticipant) =>
+		allParticipants.findIndex((member) => member === participant) === allParticipants.length - 1;
+
+	const reassembleParticipants = () => {
+		allParticipants = allowsPlusOne
+			? allParticipants
+			: allParticipants.filter(({ isPlusOne }) => isPlusOne !== true);
+		registeredParticipants = [...allParticipants].splice(0, participantLimit);
+		waitingParticipants = hasWaitingList ? [...allParticipants].splice(participantLimit) : [];
+	};
+
+	const moveParticipantUp = (participant: DisplayEventParticipant): void => {
+		if (isFirstParticipant(participant)) {
+			// cannot move up
+			return;
+		}
+		const participantInd = allParticipants.findIndex((member) => member === participant);
+
+		const tmp = allParticipants[participantInd];
+		allParticipants[participantInd] = allParticipants[participantInd - 1];
+		allParticipants[participantInd - 1] = tmp;
+
+		// reshuffle participants
+		reassembleParticipants();
+	};
+
+	const moveParticipantDown = (participant: DisplayEventParticipant): void => {
+		if (isLastParticipant(participant)) {
+			// cannot move down
+			return;
+		}
+		const participantInd = allParticipants.findIndex((member) => member === participant);
+
+		const tmp = allParticipants[participantInd];
+		allParticipants[participantInd] = allParticipants[participantInd + 1];
+		allParticipants[participantInd + 1] = tmp;
+
+		// reshuffle participants
+		reassembleParticipants();
+	};
+
+	const deleteParticipant = (participant: DisplayEventParticipant): void => {
+		allParticipants = allParticipants.filter((member) => member !== participant);
+		reassembleParticipants();
+	};
+
+	const toggleEditMode = () => {
+		inEditing = inEditing ? false : true;
 	};
 </script>
 
 <div class="centered">
 	<Card class="h-full min-h-40 min-w-110">
-		<div>
-			<form method="POST" action="?/updateEvent">
+		<form method="POST" action="?/updateEvent">
+			<div>
 				<input type="hidden" name="eventId" value={event.id} />
 				<div class="justify-self-end p-2">
 					{#if !inEditing}
@@ -116,7 +195,8 @@
 						{/snippet}
 						Yes</Toggle
 					>
-
+				</div>
+				<div>
 					{#if hasWaitingList && participantLimit < event.numParticipants}
 						<Badge color="red"
 							>Red New event is smaller than the old one. Extra participants will be moved to the
@@ -147,6 +227,8 @@
 						{/snippet}
 						Yes
 					</Toggle>
+				</div>
+				<div>
 					{#if !allowsPlusOne && event.allowsPlusOne}
 						<Badge color="red">
 							New event won't allow for plus ones. All plus one participants will be DELETED
@@ -154,52 +236,106 @@
 						</Badge>
 					{/if}
 				</div>
-			</form>
-		</div>
-		<div>
-			{#if event.participants.length > 0}
-				<p class="my-2 font-serif text-lg text-black">participants:</p>
-				<div class="mx-2 max-w-100">
-					{#each event.participants as participant, index}
-						<form class="m-1 flex" method="POST" action="?/deleteParticipant">
-							<input type="hidden" name="participantId" value={participant.id} />
-							<input type="hidden" name="eventId" value={event.id} />
-							<p class="text-m text-gray min-w-83">{index + 1}. {participant.name}</p>
-							<Button
-								hidden={!inEditing}
-								type="submit"
-								class="justify-self-end"
-								outline
-								color="red"
-								size="xs"
-								aria-label="delete-participant"><TrashBinOutline class="h-3 w-3" /></Button
-							>
-						</form>
-					{/each}
-				</div>
-			{/if}
-			{#if event.waitingParticipants.length > 0}
-				<p class="my-2 font-serif text-lg text-black">waiting list:</p>
-				<div class="mx-2">
-					{#each event.waitingParticipants as participant, index}
-						<form class="m-1 flex max-w-72" method="POST" action="?/deleteParticipant">
-							<input type="hidden" name="participantId" value={participant.id} />
-							<input type="hidden" name="eventId" value={event.id} />
-							<p class="min-w-68">{index + 1}. {participant.name}</p>
-							<Button
-								hidden={!inEditing}
-								type="submit"
-								class="justify-self-end"
-								outline
-								color="red"
-								size="xs"
-								aria-label="delete-participant"><TrashBinOutline class="h-3 w-3" /></Button
-							>
-						</form>
-					{/each}
-				</div>
-			{/if}
-		</div>
+			</div>
+			<div>
+				<input
+					type="hidden"
+					name="registeredParticipants"
+					value={registeredParticipants.map(({ id }) => id)}
+				/>
+				{#if registeredParticipants.length > 0}
+					<p class="my-2 font-serif text-lg text-black">participants:</p>
+					<div class="mx-2 max-w-100">
+						{#each registeredParticipants as participant, index}
+							<div class="inline-flex w-full items-center justify-between p-1">
+								<p class="text-m text-gray max-w-65">{index + 1}. {participant.name}</p>
+								<div class="max-w-35">
+									<Button
+										hidden={!inEditing || isFirstParticipant(participant)}
+										class="p-2"
+										outline
+										color="purple"
+										size="xs"
+										aria-label="delete-participant"
+										on:click={() => moveParticipantUp(participant)}
+										><ArrowUpOutline size="lg" class="h-3 w-3" /></Button
+									>
+									<Button
+										hidden={!inEditing || isLastParticipant(participant)}
+										class="p-2"
+										outline
+										color="purple"
+										size="xs"
+										aria-label="delete-participant"
+										on:click={() => moveParticipantDown(participant)}
+										><ArrowDownOutline size="lg" class="h-3 w-3" /></Button
+									>
+									<Button
+										hidden={!inEditing}
+										outline
+										color="red"
+										size="xs"
+										on:click={() => deleteParticipant(participant)}
+										aria-label="delete-participant"><TrashBinOutline class="h-3 w-3" /></Button
+									>
+								</div>
+							</div>
+						{/each}
+					</div>
+				{/if}
+				<input
+					type="hidden"
+					name="waitingParticipants"
+					value={waitingParticipants.map(({ id }) => id)}
+				/>
+				{#if waitingParticipants.length > 0}
+					<p class="my-2 font-serif text-lg text-black">waiting list:</p>
+					<div class="mx-2">
+						{#each waitingParticipants as participant, index}
+							<div class="inline-flex w-full items-center justify-between p-1">
+								<p class="max-w-65">{index + 1}. {participant.name}</p>
+								<div class="max-w-35">
+									<Button
+										hidden={!inEditing || isFirstParticipant(participant)}
+										class="p-2"
+										outline
+										color="purple"
+										size="xs"
+										aria-label="delete-participant"
+										on:click={() => moveParticipantUp(participant)}
+										><ArrowUpOutline size="lg" class="h-3 w-3" /></Button
+									>
+									<Button
+										hidden={!inEditing || isLastParticipant(participant)}
+										class="p-2"
+										outline
+										color="purple"
+										size="xs"
+										aria-label="delete-participant"
+										on:click={() => moveParticipantDown(participant)}
+										><ArrowDownOutline size="lg" class="h-3 w-3" /></Button
+									>
+									<Button
+										hidden={!inEditing}
+										outline
+										color="red"
+										size="xs"
+										on:click={() => deleteParticipant(participant)}
+										aria-label="delete-participant"><TrashBinOutline class="h-3 w-3" /></Button
+									>
+								</div>
+							</div>
+						{/each}
+					</div>
+				{/if}
+			</div>
+			{deletedParticipants}
+			<input
+				type="hidden"
+				name="deletedParticipants"
+				value={deletedParticipants.map(({ id }) => id)}
+			/>
+		</form>
 	</Card>
 
 	<Button class="my-4" outline href="/{event.ownerId}">Take me to my events</Button>

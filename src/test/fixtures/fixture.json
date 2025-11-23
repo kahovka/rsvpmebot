@@ -1,0 +1,61 @@
+{
+	"_id": {
+		"$oid": "67cf07213a718ab91d7d3212"
+	},
+	"ownerId": 1389062132,
+	"lang": "en",
+	"chatId": 1389062132,
+	"lastMessageId": 671,
+	"state": "polling",
+	"name": "formation astride 3",
+	"hasWaitlist": true,
+	"allowsPlusOne": false,
+	"description": "3how er beret diligently cap while pace tusk pro lovely eventually shoulder gah pro ill-fated",
+	"participantLimit": 6,
+	"participantsList": [
+		{
+			"tgid": 870035069779112,
+			"firstName": "Carmine",
+			"username": "@Lindgren",
+			"isPlusOne": false
+		},
+		{
+			"tgid": 7089268016904190,
+			"firstName": "Edythe",
+			"username": "@Roberts",
+			"isPlusOne": false
+		},
+		{
+			"tgid": 5773557740510788,
+			"firstName": "Luisa",
+			"username": "@Braun",
+			"isPlusOne": false
+		},
+		{
+			"tgid": 138371816991482,
+			"firstName": "Justen",
+			"username": "@Frami",
+			"isPlusOne": false
+		},
+		{
+			"tgid": 3618058815628630,
+			"firstName": "Dudley",
+			"username": "@Cummerata",
+			"isPlusOne": false
+		}
+	],
+	"waitlingList": [
+		{
+			"tgid": 7218058815628631,
+			"firstName": "Clara",
+			"username": "@Lux",
+			"isPlusOne": false
+		},
+		{
+			"tgid": 1389062132,
+			"firstName": "Olga",
+			"username": "Oilikkii",
+			"isPlusOne": false
+		}
+	]
+}

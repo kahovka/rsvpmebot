@@ -16,6 +16,7 @@ export interface DisplayEvent {
 export interface DisplayEventParticipant {
 	id: number;
 	name: string;
+	isPlusOne: boolean;
 }
 
 export const toDisplayEvent = (event: RSVPEvent): DisplayEvent => {
@@ -39,5 +40,6 @@ export const toDisplayParticipant = (
 	participant: RSVPEventParticipant
 ): DisplayEventParticipant => ({
 	id: participant.tgid,
-	name: `${participant.firstName} (${participant.username})`
+	name: `${participant.firstName} (${participant.username}) ${participant.isPlusOne ? '+1' : ''}`,
+	isPlusOne: participant.isPlusOne
 });
