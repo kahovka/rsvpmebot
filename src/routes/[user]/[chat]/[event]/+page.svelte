@@ -1,5 +1,5 @@
 <script>
-	import { Card, Toggle } from 'flowbite-svelte';
+	import { Badge, Card, Toggle } from 'flowbite-svelte';
 	import { Button } from 'flowbite-svelte';
 	import { EditOutline, FloppyDiskAltOutline, TrashBinOutline } from 'flowbite-svelte-icons';
 	import { Input, Label, Textarea, ButtonGroup } from 'flowbite-svelte';
@@ -100,6 +100,18 @@
 						bind:checked={hasWaitingList}
 					></Toggle>
 				</p>
+				{#if hasWaitingList && participantLimit < event.numParticipants}
+					<Badge color="red"
+						>Red New event is smaller than the old one. Extra participants will be moved to the
+						waiting list.
+					</Badge>
+				{/if}
+				{#if !hasWaitingList && participantLimit < event.numParticipants}
+					<Badge color="red">
+						New event is smaller than the old one and doesn't have a waiting list. Extra
+						participants will be DELETED PERMANENTLY. Consider adding a waiting list.
+					</Badge>
+				{/if}
 			</form>
 		</div>
 		<div>

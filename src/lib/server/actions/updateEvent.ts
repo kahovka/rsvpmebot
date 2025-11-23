@@ -26,13 +26,14 @@ export const updateEventFromUI = async (data: UpdateEventFromUIActionData) => {
 	}
 	// recalculculate participants with waiting list and new number
 	const allParticipants = [...(event.participantsList ?? []), ...(event.waitlingList ?? [])];
-	const maxParticipants = event.participantLimit ?? 0; // typesafety only
+	const maxParticipants = data.participantLimit ?? 0; // typesafety only
 
 	const newParticipantsList = maxParticipants
 		? [...allParticipants].splice(0, maxParticipants)
 		: allParticipants;
 
-	const newWaitingList = maxParticipants ? [...allParticipants].splice(maxParticipants) : [];
+	const newWaitingList =
+		maxParticipants && data.hasWaitingList ? [...allParticipants].splice(maxParticipants) : [];
 
 	const updateQuery: Partial<WithId<RSVPEvent>> = {
 		//	allowsPlusOne: data.alowsPlusOne, do this later
