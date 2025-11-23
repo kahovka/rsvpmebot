@@ -8,6 +8,11 @@ import { botMessageInlineKeyboardOptions } from '../bot/misc';
 import type TelegramBot from 'node-telegram-bot-api';
 import { logger } from '$lib/logger';
 
+export const UpdateEventFromUIParticipantSchema = z.object({
+	id: z.coerce.number(),
+	isPlusOne: z.boolean()
+});
+
 export const UpdateEventFromUIActionSchema = z.object({
 	eventId: z.string(),
 	eventName: z.string(),
@@ -16,20 +21,21 @@ export const UpdateEventFromUIActionSchema = z.object({
 	hasWaitingList: z.string().toLowerCase().transform(JSON.parse).pipe(z.boolean()),
 	allowsPlusOne: z.string().toLowerCase().transform(JSON.parse).pipe(z.boolean()),
 	registeredParticipants: z.preprocess(
-		(val: string) => (val ? val.split(',') : []),
-		z.array(z.coerce.number())
+		(val: string) => JSON.parse(val),
+		z.array(UpdateEventFromUIParticipantSchema)
 	),
 	waitingParticipants: z.preprocess(
-		(val: string) => (val ? val.split(',') : []),
-		z.array(z.coerce.number())
+		(val: string) => JSON.parse(val),
+		z.array(UpdateEventFromUIParticipantSchema)
 	),
 	deletedParticipants: z.preprocess(
-		(val: string) => (val ? val.split(',') : []),
-		z.array(z.coerce.number())
+		(val: string) => JSON.parse(val),
+		z.array(UpdateEventFromUIParticipantSchema)
 	)
 });
 
 export type UpdateEventFromUIActionData = z.infer<typeof UpdateEventFromUIActionSchema>;
+export type UpdateEventFromUIParticipant = z.infer<typeof UpdateEventFromUIParticipantSchema>;
 
 export const updateEventFromUI = async (data: UpdateEventFromUIActionData) => {
 	const eventId = new ObjectId(data.eventId);
@@ -41,26 +47,33 @@ export const updateEventFromUI = async (data: UpdateEventFromUIActionData) => {
 	// this is a tad tricky, if someone voted while the event was in editing, we still need to append them
 	const combinedParticipants = [...(event.participantsList ?? []), ...(event.waitlingList ?? [])];
 	const additionalParticipants = combinedParticipants.filter(
-		({ tgid }) =>
-			!(
-				data.registeredParticipants.includes(tgid) ||
-				data.waitingParticipants.includes(tgid) ||
-				data.deletedParticipants.includes(tgid)
-			)
+		({ tgid, isPlusOne }) =>
+			![
+				...data.registeredParticipants,
+				...data.waitingParticipants,
+				...data.deletedParticipants
+			].find((member) => member.id === tgid && member.isPlusOne === isPlusOne)
 	);
+
 	if (additionalParticipants.length > 0)
 		logger.info(
-			'Seems like there are more participants in the survey as in the payload {ids}. Will append them.',
-			{
-				ids: additionalParticipants
-			}
+			'Seems like there are more participants in the survey as in the payload {additionalParticipants}. Will append them.',
+			{ additionalParticipants }
 		);
 
 	const registeredParticipants = data.registeredParticipants
-		.map((pid) => combinedParticipants.find(({ tgid }) => tgid === pid))
+		.map((data) =>
+			combinedParticipants.find(
+				({ tgid, isPlusOne }) => tgid === data.id && isPlusOne === data.isPlusOne
+			)
+		)
 		.filter((participant) => !!participant);
 	const waitingParticipants = data.waitingParticipants
-		.map((pid) => combinedParticipants.find(({ tgid }) => tgid === pid))
+		.map((data) =>
+			combinedParticipants.find(
+				({ tgid, isPlusOne }) => tgid === data.id && isPlusOne === data.isPlusOne
+			)
+		)
 		.filter((participant) => !!participant);
 
 	let allParticipants = [
@@ -93,7 +106,7 @@ export const updateEventFromUI = async (data: UpdateEventFromUIActionData) => {
 		waitlingList: newWaitingList
 	};
 
-	logger.info('Updating event from UI with {query}', { query: updateQuery });
+	logger.info('Updating event {event} from UI with {query}', { event: event, query: updateQuery });
 	await updateEventById(eventId, updateQuery).then(async (updatedEvent) => {
 		bot.deleteMessage(event.chatId, event.lastMessageId);
 		const messageToSend = getEventDescriptionHtml(updatedEvent);

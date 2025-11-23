@@ -241,7 +241,7 @@
 				<input
 					type="hidden"
 					name="registeredParticipants"
-					value={registeredParticipants.map(({ id }) => id)}
+					value={JSON.stringify(registeredParticipants)}
 				/>
 				{#if registeredParticipants.length > 0}
 					<p class="my-2 font-serif text-lg text-black">participants:</p>
@@ -286,7 +286,7 @@
 				<input
 					type="hidden"
 					name="waitingParticipants"
-					value={waitingParticipants.map(({ id }) => id)}
+					value={JSON.stringify(waitingParticipants)}
 				/>
 				{#if waitingParticipants.length > 0}
 					<p class="my-2 font-serif text-lg text-black">waiting list:</p>
@@ -329,12 +329,8 @@
 					</div>
 				{/if}
 			</div>
-			{deletedParticipants}
-			<input
-				type="hidden"
-				name="deletedParticipants"
-				value={deletedParticipants.map(({ id }) => id)}
-			/>
+			{JSON.stringify(deletedParticipants)}
+			<input type="hidden" name="deletedParticipants" value={JSON.stringify(deletedParticipants)} />
 		</form>
 	</Card>
 

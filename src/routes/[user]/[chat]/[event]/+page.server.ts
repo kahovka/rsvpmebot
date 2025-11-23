@@ -48,6 +48,7 @@ export const actions = {
 
 	updateEvent: async ({ request }) => {
 		const formData = await request.formData();
+		logger.info('updating event {data}', { data: formData });
 		try {
 			const data = UpdateEventFromUIActionSchema.parse(Object.fromEntries(formData));
 			logger.info('updating event {data}', { data });
